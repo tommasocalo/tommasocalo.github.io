@@ -1,6 +1,6 @@
 title: Tommaso
-tagline: Research Scientist at Apple
-url: http://tommasocalo.me
+tagline: PhD Candidate at PoliTO
+url: http://tommasocalo.github.io
 baseurl: ""
 # gems: [jekyll-paginate]
 # paginate: 5
@@ -15,7 +15,7 @@ sass:
 
 author:
   name: Tommaso
-  url: hhttp://tommasocalo.me
+  url: hhttp:/tommasocalo.github.io
   email: tommaso.calo@polito.it
 
 markdown: kramdown
