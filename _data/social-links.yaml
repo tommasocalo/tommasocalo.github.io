@@ -1,0 +1,62 @@
+- id: email
+  description: "tommaso.calo@polito.it"
+  color: "#515151"
+  class: "fas fa-envelope icon"
+  url: "mailto:tommaso.calo@polito.it"
+  on-homepage: true
+  cv-group: 1
+
+- id: twitter
+  description: "@TommasoCalo1"
+  color: "#1da1f2"
+  class: "fab fa-twitter icon"
+  url: https://twitter.com/TommasoCalo1
+  on-homepage: true
+  cv-group: 2
+
+- id: github
+  description: "@tommasocalo"
+  color: "#6e5494"
+  class: "fab fa-github icon"
+  url: "https://github.com/tommasocalo"
+  on-homepage: true
+  cv-group: 2
+
+- id: linkedin
+  description: "tommasocalo"
+  color: "#0077b5"
+  class: "fab fa-linkedin-in icon"
+  url: "http://www.linkedin.com/in/tommasocalo"
+  on-homepage: true
+
+
+- id: home
+  description: "tommasocalo.me"
+  color: "#515151"
+  class: "fas fa-home icon"
+  url: "https://fredhohman.com"
+  on-homepage: false
+  cv-group: 1
+
+- id: scholar
+  description: "Google Scholar"
+  color: "#515151"
+  class: "fa fa-graduation-cap icon"
+  url: "https://scholar.google.com/citations?user=XRQkBEAAAAAJ&hl=it"
+  on-homepage: true
+  cv-group: 2
+
+- id: cv
+  description: CV PDF
+  color: "#ba2818"
+  class: "far fa-file-pdf icon"
+  url: "/cv.pdf"
+  on-homepage: false
+  cv-group: 1
+
+- id: cv-web
+  description: CV
+  color: "#515151"
+  class: "fa fa-address-card icon"
+  url: "/cv"
+  on-homepage: false

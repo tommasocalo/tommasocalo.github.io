@@ -1,0 +1,44 @@
+- institution: Politecnico Di Torino
+  position: Graduate Teaching Assistant
+  location: "Turin, Italy"
+  year: Fall 2023
+  class: "Human Computer Interaction (02JSK)"
+  instructor: Luigi De Russis
+  description: "Mentored student team projects for Human Computer Interaction (02JSK), an Master's-level course with 119 students enrolled."
+  institution-url: https://www.polito.it/
+  class-url: https://elite.polito.it/teaching/02jsk-hci
+  ta: true
+
+- institution: Politecnico Di Torino
+  position: Graduate Teaching Assistant
+  location: "Turin, Italy"
+  year: Spring 2023
+  class: "Image Processing and Computer vision (01TUJOV)"
+  instructor: Bartolomeo Montrucchio
+  description: "Mentored laboratory sessions for 'Image Processing and Computer Vision', a Master's-level course with 119 enrolled students."    
+  institution-url: https://www.polito.it/
+  class-url: https://didattica.polito.it/pls/portal30/gap.pkg_guide.viewGap?p_cod_ins=01TUJOV&p_a_acc=2025&p_header=S&p_lang=IT&multi=N
+  ta: true
+
+- institution: Politecnico Di Torino
+  position: Graduate Teaching Assistant
+  location: "Turin, Italy"
+  year: Fall 2023
+  class: "Human Computer Interaction (02JSK)"
+  instructor: Luigi De Russis
+  description: "Mentored student team projects for Human Computer Interaction (02JSK), an MS course with 119 students enrolled."
+  institution-url: https://www.polito.it/
+  class-url: https://elite.polito.it/teaching/02jsk-hci
+  ta: true
+
+- institution: Politecnico Di Torino
+  position: Graduate Teaching Assistant
+  location: "Turin, Italy"
+  year: Fall 2023
+  class: "Human Computer Interaction (02JSK)"
+  instructor: Luigi De Russis
+  description: "Mentored student team projects for Human Computer Interaction (02JSK), an MS course with 134 students enrolled."
+  institution-url: https://www.polito.it/
+  class-url: https://elite.polito.it/teaching/02jsk-hci
+  ta: true
+

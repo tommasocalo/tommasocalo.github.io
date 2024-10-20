@@ -1,0 +1,28 @@
+- degree: "Ph.D. in Artificial Intelligence"
+  institution: Politecnico Di Torino
+  location: "Turin, Italy"
+  advisor: Luigi De Russis
+  co-advisor: Fulvio Corno
+  years: "Nov. 2021 —"
+  years-extra: ""
+  thesis: "Lowering Barriers: AI-Driven Techniques for End-User Software Creation"
+
+  institution-url: https://www.polito.it/
+
+- degree: "M.S. in Data Science & Engineering"
+  institution: Politecnico Di Torino
+  location: "Turin, Italy"
+  years: October 2021
+  advisor: Luca Cagliero
+  co-advisor: Jacopo Fior
+  thesis: "Financial Time Series Summarization"
+  thesis-pdf: ../papers/tommaso-calo-thesis.pdf
+
+  institution-url: https://www.polito.it/
+
+
+- degree: "B.S. in Information Systems"
+  years: March 2019
+  institution: Politecnico Di Torino
+  location: "Turin, Italy"
+  institution-url: https://www.polito.it/

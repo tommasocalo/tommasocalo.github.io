@@ -1,0 +1,17 @@
+- name: Luigi De Russis
+  position: Associate Professor
+  group: Department of Computer Engineering and Automation
+  institution: Politecnico Di Torino
+  location: Turin, Italy
+  phd: true
+  website: "https://www.polito.it/personale?p=luigi.derussis"
+  url: "https://www.polito.it/personale?p=luigi.derussis"
+
+- name: Christopher MacLellan
+  position: Assistant Professor
+  group: School of Interactive Computing
+  institution: Georgia Institute of Technology
+  location: Atlanta, GA, USA
+  phd: true
+  website: "https://chrismaclellan.com/"
+  url: "https://www.cc.gatech.edu/people/christopher-j-maclellan"
