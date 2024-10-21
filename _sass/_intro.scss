@@ -172,8 +172,11 @@ $cv-icon-aspect-ratio: 1.33;
 
 @media screen and (max-width: $mobile) {
 	#intro-image {
-		height: 5rem;
-		width: 5rem;
+
+		min-width: 5rem;  /* Prevent shrinking */
+		min-height: 5rem; /* Prevent shrinking */
+		max-width: 5rem;  /* Prevent expanding */
+		max-height: 5rem;
 	}
 
 	#intro-title {
