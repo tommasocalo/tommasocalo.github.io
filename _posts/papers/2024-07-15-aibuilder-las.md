@@ -7,7 +7,7 @@ title: "Towards Educator-Driven Tutor Authoring: Generative AI Approaches for Cr
 authors: 
   - Tommaso Calò
   - Christopher MacLellan
-venue: Symposium on Engineering Interactive Computing Systems
+venue: ACM Conference on Learning @ Scale 
 venue-shorthand: L@S
 location: Atlanta, GA
 year: 2024

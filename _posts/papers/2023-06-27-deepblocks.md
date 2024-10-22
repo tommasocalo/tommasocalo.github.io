@@ -7,7 +7,7 @@ title: "Towards A Visual Programming Tool to Create Deep Learning Models"
 authors: 
   - Tommaso Calò
   - Luigi De Russis
-venue: Symposium on Engineering Interactive Computing Systems
+venue: ACM SIGCHI Symposium on Engineering Interactive Computing Systems
 venue-shorthand: EICS
 location: Swansea, United Kingdom
 year: 2023

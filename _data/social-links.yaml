@@ -31,10 +31,10 @@
 
 
 - id: home
-  description: "tommasocalo.me"
+  description: "tommasocalo.github.io"
   color: "#515151"
   class: "fas fa-home icon"
-  url: "https://fredhohman.com"
+  url: "https://tommasocalo.github.io"
   on-homepage: false
   cv-group: 1
 
