@@ -158,6 +158,68 @@ $cv-icon-aspect-ratio: 1.33;
 	background: $black-05;
 	transform: scale(1.03);
 }
+// Add these styles to your existing SCSS file
+.news-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.news-item {
+	display: flex;
+	flex-direction: column;
+	background-color: $black-025;
+	border-radius: 0.5rem;
+	padding: 1.25rem;
+	position: relative;
+	transition: all .2s ease-in-out;
+	
+	&:hover {
+			transform: scale(1.03);  // Same enlargement animation as featured
+			background-color: $black-05;
+	}
+}
+
+.news-item:hover {
+	background-color: $black-05;
+}
+
+.news-content-wrapper {
+	flex: 1;
+}
+
+.news-date {
+	color: $silver;
+	font-size: 0.9rem;
+	margin-bottom: 0.5rem;
+}
+
+.news-content {
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+
+.news-actions {
+	align-self: flex;
+	margin-top: 0.2rem;
+}
+
+.news-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.875rem;
+	color: $text-color;
+	padding: 0;
+	background: none;
+	border: none;
+	
+	i {
+			font-size: 0.875rem;
+	}
+}
 
 @media screen and (max-width: $homepage-pre-mobile) {
 	#intro-wrapper, .feature-title, .feature-text, .intro-text, .home-hr {
@@ -168,6 +230,10 @@ $cv-icon-aspect-ratio: 1.33;
 		display: flex;
 		flex-direction: row;
 	}
+
+	.news-wrapper {
+		grid-column: page !important;
+}
 }
 
 @media screen and (max-width: $mobile) {
@@ -201,4 +267,5 @@ $cv-icon-aspect-ratio: 1.33;
 		color: $text-color;
 		font-weight: 500;
 	}
+
 }

@@ -1,0 +1,20 @@
+<div class="news-list">
+    {% assign sortedNews = site.categories.news | sort: 'date' | reverse %}
+    {% for news in sortedNews %}
+    <div class="news-item">
+        <div class="news-content-wrapper">
+            <div class="news-date">{{ news.date | date: "%B %d, %Y" }}</div>
+            <div class="news-content">{{ news.content }}</div>
+        </div>
+        {% if news.pdf %}
+        <div class="cover-links">
+            <span class="pub-misc">
+                <a href="{{ news.pdf }}">
+                    <i class="fas fa-file-pdf" aria-hidden="true"></i> PDF
+                </a>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
