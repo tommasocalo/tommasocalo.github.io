@@ -21,17 +21,14 @@ $cover-width: 8.5px;
 
 .cover {
   height: $cover-height*$cover-size-scalar;
-  width: $cover-width*$cover-size-scalar;
-  
+  // width: $cover-width*$cover-size-scalar;
   text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
   background-color: $black-025;
   border-radius: 1.5rem;
   transition: all .2s ease-in-out;
-
 }
 
 .cover:hover {
