@@ -70,7 +70,7 @@ title: Home
    Latest research for fans of Machine Learning and Human-Computer Interaction.
 </p>
 <div class="cover-wrapper cover-wrapper-3-col l-page">
-   {% assign sortedPublications = site.categories.papers | sort: 'feature-order' %}
+   {% assign sortedPublications = site.categories.papers | sort: 'path'| reverse %}
    {% for feature in sortedPublications %}
    {% if feature.featured == true %}
    {% include feature.html feature=feature %}
