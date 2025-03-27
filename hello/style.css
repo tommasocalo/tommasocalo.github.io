@@ -803,9 +803,17 @@ body {
     498px 1947px #fff, 617px 880px #fff, 240px 403px #fff;
 }
 
-
-  /* Add this to your CSS for a more cosmic look */
-.comet-particle {
+html, body {
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    overscroll-behavior: none;
+    touch-action: none;
+  }
+  
+  /* Comet particle styling */
+  .comet-particle {
     position: absolute;
     pointer-events: none;
     background: radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(120, 190, 255, 0.6) 70%, transparent 100%);
@@ -816,4 +824,12 @@ body {
       0 0 15px rgba(255, 255, 255, 0.8),
       0 0 30px rgba(70, 131, 255, 0.4);
     transition: opacity 0.5s ease;
+  }
+  
+  /* Ensure content is centered and visible without scrolling */
+  #links {
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
