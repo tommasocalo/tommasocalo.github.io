@@ -10,9 +10,40 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
     <!-- Core theme CSS -->
     <link rel="stylesheet" href="style.css">
+    <style>
+      /* Instagram browser compatibility styles */
+      html, body {
+        position: fixed !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        touch-action: manipulation !important;
+        -webkit-overflow-scrolling: none !important;
+        overscroll-behavior: none !important;
+        -webkit-user-select: none !important;
+      }
+      
+      .comet-particle {
+        position: absolute;
+        pointer-events: none;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(120, 190, 255, 0.6) 70%, transparent 100%);
+        border-radius: 50%;
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(70, 131, 255, 0.4);
+        transition: opacity 0.5s ease;
+      }
+      
+      /* Extra fix for Instagram browser */
+      body * {
+        touch-action: manipulation !important;
+      }
+    </style>
   </head>
 
-  <body>
+  <body ontouchmove="event.preventDefault();">
     <!-- Parallax Pixel Background Animation -->
     <section class="animated-background">
       <div id="stars1"></div>
@@ -25,14 +56,11 @@
       <img src="img.png" alt="Profile Picture">
     </a>
 
-
-
     <div id="userName">
       @tommasocalo
     </div>
 
     <div id="links">
-
       <a class="link" href="https://www.last.fm/user/tommasocalo" target="_blank">
         <i class="fas fa-music">&nbsp;</i>Music
       </a>
@@ -49,129 +77,147 @@
         <i class="fas fa-briefcase">&nbsp;</i>Research
       </a>
     </div>
+    
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-  let isDragging = false;
-  let lastX, lastY;
-  const trailElements = [];
-  const maxTrailLength = 15;
-  
-  // iOS-specific fixes to prevent scrolling
-  document.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-  }, { passive: false });
-  
-  // Also prevent other default behaviors
-  document.addEventListener('gesturestart', function(e) {
-    e.preventDefault();
-  }, { passive: false });
-  
-  // Touch start event
-  document.addEventListener('touchstart', function(e) {
-    isDragging = true;
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
-    
-    // Create the comet head
-    createCometParticle(lastX, lastY, 1);
-  });
-  
-  // Touch move event with physics
-  document.addEventListener('touchmove', function(e) {
-    if (!isDragging) return;
-    
-    const currentX = e.touches[0].clientX;
-    const currentY = e.touches[0].clientY;
-    
-    // Calculate velocity (speed and direction)
-    const dx = currentX - lastX;
-    const dy = currentY - lastY;
-    const speed = Math.sqrt(dx*dx + dy*dy);
-    
-    // Only create particles if moving fast enough
-    if (speed > 3) {
-      // Create a particle with size based on speed
-      const sizeMultiplier = Math.min(speed / 10, 1.5);
-      createCometParticle(currentX, currentY, sizeMultiplier);
-      
-      // For faster movements, create intermediate particles to fill gaps
-      if (speed > 20) {
-        const steps = Math.floor(speed / 10);
-        for (let i = 1; i < steps; i++) {
-          const ratio = i / steps;
-          const interpX = lastX + dx * ratio;
-          const interpY = lastY + dy * ratio;
-          createCometParticle(interpX, interpY, sizeMultiplier * (1 - ratio * 0.5));
-        }
-      }
-    }
-    
-    // Update last position
-    lastX = currentX;
-    lastY = currentY;
-    
-    // Remove old particles if we have too many
-    while (trailElements.length > maxTrailLength) {
-      const oldestParticle = trailElements.shift();
-      if (oldestParticle && oldestParticle.parentNode) {
-        oldestParticle.parentNode.removeChild(oldestParticle);
-      }
-    }
-  });
-  
-  // Touch end event
-  document.addEventListener('touchend', function() {
-    isDragging = false;
-    
-    // Fade out and remove all trail elements
-    trailElements.forEach((element, index) => {
-      setTimeout(() => {
-        element.style.opacity = '0';
-        setTimeout(() => {
-          if (element.parentNode) {
-            element.parentNode.removeChild(element);
+      // Instagram browser compatible version
+      window.onload = function() {
+        // Force initial scroll position
+        window.scrollTo(0, 0);
+        
+        let isDragging = false;
+        let lastX, lastY;
+        const trailElements = [];
+        const maxTrailLength = 15;
+        
+        // Multiple approaches to prevent scrolling
+        document.ontouchmove = function(e) { 
+          e.preventDefault(); 
+        };
+        
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.position = 'fixed';
+        document.body.style.position = 'fixed';
+        
+        // Listen for all events that might cause scrolling
+        const events = ['touchstart', 'touchmove', 'touchend', 'touchcancel', 
+                        'wheel', 'mousewheel'];
+        
+        events.forEach(function(event) {
+          window.addEventListener(event, function(e) {
+            e.preventDefault();
+          }, { passive: false });
+          
+          document.addEventListener(event, function(e) {
+            e.preventDefault();
+          }, { passive: false });
+        });
+        
+        // Touch start event
+        document.addEventListener('touchstart', function(e) {
+          isDragging = true;
+          lastX = e.touches[0].clientX;
+          lastY = e.touches[0].clientY;
+          
+          createCometParticle(lastX, lastY, 1);
+          
+          e.preventDefault();
+        }, { passive: false });
+        
+        // Touch move event
+        document.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          
+          const currentX = e.touches[0].clientX;
+          const currentY = e.touches[0].clientY;
+          
+          const dx = currentX - lastX;
+          const dy = currentY - lastY;
+          const speed = Math.sqrt(dx*dx + dy*dy);
+          
+          if (speed > 3) {
+            const sizeMultiplier = Math.min(speed / 10, 1.5);
+            createCometParticle(currentX, currentY, sizeMultiplier);
+            
+            if (speed > 20) {
+              const steps = Math.floor(speed / 10);
+              for (let i = 1; i < steps; i++) {
+                const ratio = i / steps;
+                const interpX = lastX + dx * ratio;
+                const interpY = lastY + dy * ratio;
+                createCometParticle(interpX, interpY, sizeMultiplier * (1 - ratio * 0.5));
+              }
+            }
           }
-        }, 500);
-      }, index * 30);
-    });
-    
-    // Clear the array
-    trailElements.length = 0;
-  });
-  
-  // Function to create a comet particle
-  function createCometParticle(x, y, scale) {
-    const particle = document.createElement('div');
-    particle.classList.add('comet-particle');
-    
-    // Set position
-    particle.style.left = x + 'px';
-    particle.style.top = y + 'px';
-    
-    // Set size based on position in the trail
-    const size = 15 * scale;
-    particle.style.width = size + 'px';
-    particle.style.height = size + 'px';
-    
-    // Add to body
-    document.body.appendChild(particle);
-    
-    // Add to our trail array
-    trailElements.push(particle);
-    
-    // Apply different styles to trail particles
-    trailElements.forEach((elem, index) => {
-      const opacity = 1 - (index / maxTrailLength);
-      const particleSize = size - (index * (size / maxTrailLength));
-      
-      elem.style.opacity = opacity.toString();
-      elem.style.width = particleSize + 'px';
-      elem.style.height = particleSize + 'px';
-      elem.style.boxShadow = `0 0 ${10 + particleSize}px rgba(255, 255, 255, ${opacity * 0.8})`;
-    });
-  }
-});
+          
+          lastX = currentX;
+          lastY = currentY;
+          
+          while (trailElements.length > maxTrailLength) {
+            const oldestParticle = trailElements.shift();
+            if (oldestParticle && oldestParticle.parentNode) {
+              oldestParticle.parentNode.removeChild(oldestParticle);
+            }
+          }
+          
+          e.preventDefault();
+        }, { passive: false });
+        
+        // Touch end event
+        document.addEventListener('touchend', function() {
+          isDragging = false;
+          
+          trailElements.forEach(function(element, index) {
+            setTimeout(function() {
+              element.style.opacity = '0';
+              setTimeout(function() {
+                if (element.parentNode) {
+                  element.parentNode.removeChild(element);
+                }
+              }, 500);
+            }, index * 30);
+          });
+          
+          trailElements.length = 0;
+        });
+        
+        // Function to create a comet particle
+        function createCometParticle(x, y, scale) {
+          const particle = document.createElement('div');
+          particle.classList.add('comet-particle');
+          
+          particle.style.left = x + 'px';
+          particle.style.top = y + 'px';
+          
+          const size = 15 * scale;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+          
+          document.body.appendChild(particle);
+          trailElements.push(particle);
+          
+          trailElements.forEach(function(elem, index) {
+            const opacity = 1 - (index / maxTrailLength);
+            const particleSize = size - (index * (size / maxTrailLength));
+            
+            elem.style.opacity = opacity.toString();
+            elem.style.width = particleSize + 'px';
+            elem.style.height = particleSize + 'px';
+            elem.style.boxShadow = '0 0 ' + (10 + particleSize) + 'px rgba(255, 255, 255, ' + (opacity * 0.8) + ')';
+          });
+        }
+        
+        // Extra fixes for Instagram browser
+        function preventScroll() {
+          window.scrollTo(0, 0);
+        }
+        
+        // Apply frequently to keep page from scrolling
+        setInterval(preventScroll, 100);
+        
+        // Also try to use older event bindings for maximum compatibility
+        window.onscroll = preventScroll;
+      };
     </script>
-    
   </body>
 </html>
