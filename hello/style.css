@@ -802,36 +802,4 @@ body {
     494px 1957px #fff, 1296px 431px #fff, 175px 1507px #fff, 831px 121px #fff,
     498px 1947px #fff, 617px 880px #fff, 240px 403px #fff;
 }
-/* iOS-specific fixes */
-html, 
-body {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  touch-action: none;
-  -webkit-overflow-scrolling: none;
-  overscroll-behavior: none;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
 
-.comet-particle {
-  position: absolute;
-  pointer-events: none;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(120, 190, 255, 0.6) 70%, transparent 100%);
-  border-radius: 50%;
-  z-index: 1000;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(70, 131, 255, 0.4);
-  transition: opacity 0.5s ease;
-}
-
-/* Ensure content is properly positioned */
-#links {
-  position: relative;
-  z-index: 10;
-}
