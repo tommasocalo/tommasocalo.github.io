@@ -8,7 +8,7 @@ jsarr:
 
 <h1 id="cv-title"><a href="{{ site.url }}">Tommaso Calò</a></h1>
 
-<p id="cv-subtitle"><i>PhD Candidate (<span class="cv-vis">HCI</span> + <span class="cv-ai">AI</span>)</i></p>
+<p id="cv-subtitle"><i>Ph.D. in Artificial Intelligence (<span class="cv-vis">HCI</span> + <span class="cv-ai">AI</span>)</i></p>
 
 <!-- <div id="cv-toc">
 <ul class="cv-description">
@@ -30,10 +30,8 @@ jsarr:
 </div> -->
 
 <div>
-I create <b><span class="cv-vis">interactive systems</span></b> to empower people with <b><span class="cv-ai">AI</span></b>. My goal is to enhance <b>creativity </b>and<b> productivity</b> in <b>UI Design and Software Development</b>. In my projects, I use methods from <b>Human-Centered Design</b>, <b>Deep Learning</b> and <b>Software Engineering</b>. 
+My research aims to <b>democratize advanced AI tools</b> by bridging Human–Computer Interaction, visual programming, and program synthesis. I develop intuitive authoring environments, including sketch-to-code systems, multimodal design tools, and AI-powered educational interfaces, <b>enabling non-experts to harness complex technologies effortlessly</b>. My ongoing goal is to create adaptive, transparent AI interactions that empower users, fostering widespread computational creativity and narrowing the digital divide.
 </div>
-
-
 
 <div class="cv-spacer"></div>
 
@@ -63,6 +61,25 @@ I create <b><span class="cv-vis">interactive systems</span></b> to empower peopl
 {% include cv/degree.html degree=degree %}
 {% endfor %}
 {:/}
+
+## Professional Experience
+
+**Visiting Scholar** (Feb 2024 — Jul 2024)  
+*Georgia Institute of Technology*, Atlanta, USA  
+- Conducted research on human-like learning in AI systems under Prof. Christopher MacLellan
+- Developed novel approaches for educator-driven intelligent tutoring systems, published paper at L@S 2024 on AI-assisted tutor authoring
+
+**Python Programming Instructor** (Sep 2023 — Dec 2023)  
+*ITS Foundation*, Turin, Italy  
+- Taught Python programming to 30 students with aerospace/mechatronics focus
+
+**Teaching Assistant - Computer Vision** (Feb 2023 — Jul 2023)  
+*Politecnico di Torino*, Turin, Italy  
+- Led 12 hands-on labs for 80 students on algorithm implementation and ML integration
+
+**Teaching Assistant - Human Computer Interaction** (Sep 2022 — Present)  
+*Politecnico di Torino*, Turin, Italy  
+- Guide 50+ students annually in developing and evaluating AI-driven user interfaces
 
 ## Honors and Awards
 
@@ -155,7 +172,11 @@ I create <b><span class="cv-vis">interactive systems</span></b> to empower peopl
 {% endfor %}
 {:/}
 
+## Certifications & Languages
 
+**TOEFL iBT**: 98/120 (C1 Level)  
+**Italian**: Native  
+**English**: Fluent (C1)
 
 <!-- ## Technology Skills
 

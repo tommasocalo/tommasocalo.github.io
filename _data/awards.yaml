@@ -1,7 +1,27 @@
+- name: "Top 5% Finisher - Ibiza Half Marathon"
+  description: "Finished in the top 5% of participants in the Ibiza Half Marathon"
+  year: 2025
 
-- name: "FSAE Championship"
+- name: "3rd Place - Winter Sailing Championship"
+  description: "Third place finish in the Winter Sailing Championship"
+  year: 2024
+
+- name: "PhD Scholarship"
+  description: "Three-year merit-based PhD scholarship at Politecnico di Torino"
+  year: 2021
+
+- name: "PwC Cybersecurity Challenge"
+  description: "First place in the PwC Cybersecurity Challenge"
+  year: 2020
+
+- name: "FSAE Italy Electric Category"
   description: "First place in the electric vehicle category at the Formula SAE Italy competition with the PoliTo racing team"
-  year: 2018
-- name: "Accenture Cybersecurity Competition"
-  description: "First place in the Accenture Cybersecurity Competition held at Politecnico di Torino"
   year: 2019
+
+- name: "Top 10 - High School Mathematics Competition"
+  description: "Finished in the top 10 of the High School Mathematics Competition"
+  year: 2015
+
+- name: "Exchange Student Recognition"
+  description: "Ranked in Top 5% in Mathematics at Sydney High School during exchange program"
+  year: 2014
