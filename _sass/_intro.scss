@@ -196,6 +196,21 @@ $cv-icon-aspect-ratio: 1.33;
 	background-color: $black-05;
 }
 
+// Improve hover behavior for expanded items with images
+.news-item { will-change: transform; }
+
+.news-item.expanded:hover {
+	transform: translateY(-2px) scale(1.015);
+	transform-origin: top center; // bias growth upward to reduce downward overlap
+}
+
+// Ensure images in expanded details don't cause layout jumps
+.news-details img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
 .news-wrapper .news-content-wrapper {
 	display: grid;
 	grid-template-columns: 1fr auto;

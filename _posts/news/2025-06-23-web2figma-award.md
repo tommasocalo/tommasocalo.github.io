@@ -2,7 +2,7 @@
 layout: post
 title: "Best Late Breaking Result Award at EICS Companion 2025"
 categories: [news]
-summary: "🏆 **From Web to Figma** won the Best Late Breaking Result Award at EICS Companion 2025."
+summary: "🏆 **From Web to Figma** won the Best Late Breaking Result Award at EICS 2025."
 project: /papers/web2figma
 pdf: /papers/25-web2figma-eics.pdf
 ---
