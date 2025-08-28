@@ -326,6 +326,10 @@ $cv-icon-aspect-ratio: 1.33;
 	margin-top: 0.35rem;
 }
 
+// Force-hide collapsed summary and right-side links when expanded (override mobile rules)
+.news-item.expanded .news-summary { display: none !important; }
+.news-item.expanded .summary-links { display: none !important; }
+
 @media screen and (max-width: $homepage-pre-mobile) {
 	#intro-wrapper, .feature-title, .feature-text, .intro-text, .home-hr {
 		grid-column: page !important;
