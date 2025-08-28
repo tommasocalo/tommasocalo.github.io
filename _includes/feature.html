@@ -27,6 +27,10 @@
 				{{ feature.year }}
 			</div>
 
+			{% if feature.award %}
+			<div class="cover-award"><i class="fas fa-trophy" aria-hidden="true"></i> {{ feature.award }}</div>
+			{% endif %}
+
 		</div>
 
 		<div class="cover-footer-wrapper">

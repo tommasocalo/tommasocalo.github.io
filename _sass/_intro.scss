@@ -18,12 +18,20 @@ $cv-icon-aspect-ratio: 1.33;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	width: 8rem;
+	height: 8rem;
+	flex: 0 0 auto;
+	overflow: hidden;
+	border-radius: 50%;
 }
 
 #intro-image {
-	border-radius: 5rem;
-	height: 8rem;
-	width: 8rem;
+	border-radius: 50%;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	aspect-ratio: 1 / 1;
 }
 
 #intro-title-text-wrapper {
@@ -31,6 +39,7 @@ $cv-icon-aspect-ratio: 1.33;
 	flex-direction: column;
 	margin-left: 1rem;
 	justify-content: center;
+	flex: 1;
 }
 
 #intro-title {
@@ -162,16 +171,18 @@ $cv-icon-aspect-ratio: 1.33;
 .news-wrapper {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
-	margin-bottom: 2rem;
+	gap: 0.75rem;
+	margin-bottom: 1.25rem;
 }
 
 .news-item {
+	// pointer to indicate interactivity
+	cursor: pointer;
 	display: flex;
 	flex-direction: column;
 	background-color: $black-025;
 	border-radius: 0.5rem;
-	padding: 1.25rem;
+	padding: 0.7rem 0.9rem; // tighter vertical padding
 	position: relative;
 	transition: all .2s ease-in-out;
 	
@@ -185,21 +196,55 @@ $cv-icon-aspect-ratio: 1.33;
 	background-color: $black-05;
 }
 
-.news-content-wrapper {
-	flex: 1;
+.news-wrapper .news-content-wrapper {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		"date links"
+		"summary links"
+		"details details";
+	row-gap: 0.05rem; // tighter date-to-text spacing for collapsed and expanded
+	column-gap: 0.75rem;
+	align-items: start;
 }
 
-.news-date {
+.news-wrapper .news-date {
+	grid-area: date;
 	color: $silver;
 	font-size: 0.9rem;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0; // rely on row-gap only
 }
 
 .news-content {
-	font-size: 1rem;
-	line-height: 1.5;
+	font-size: 0.95rem;
+	line-height: 1.4;
 }
 
+.news-wrapper .news-summary {
+	grid-area: summary;
+	font-size: 0.95rem;
+	line-height: 1.4;
+	margin: 0;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-width: 0;
+}
+
+.news-item.expanded .news-summary {
+	display: none;
+}
+
+.news-wrapper .news-details {
+	grid-area: details;
+	display: none;
+	margin-top: 0.5rem;
+}
+
+.news-item.expanded .news-details {
+	display: block;
+}
 
 .news-actions {
 	align-self: flex;
@@ -221,6 +266,66 @@ $cv-icon-aspect-ratio: 1.33;
 	}
 }
 
+.news-button.news-toggle {
+	cursor: pointer;
+}
+
+.news-item.expanded .news-button.news-toggle i::before {
+	content: "\f077"; // fa-chevron-up when expanded
+}
+
+.news-summary-row {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.news-wrapper .summary-links {
+	grid-area: links;
+	align-self: center;
+	justify-self: end;
+	display: flex;
+	gap: 0.35rem;
+	margin: 0;
+}
+
+// Keep collapsed and expanded link styles consistent
+.news-wrapper .cover-links.summary-links .pub-misc a,
+.news-wrapper .cover-links.expanded-links .pub-misc a {
+	display: inline-flex;
+	align-items: center;
+	line-height: 1.3;
+}
+
+.news-wrapper .cover-links.summary-links .pub-misc a i,
+.news-wrapper .cover-links.expanded-links .pub-misc a i {
+	margin-right: 0.25rem;
+}
+
+// Maintain spacing below details links in expanded state (larger than date-to-text)
+.news-wrapper .news-details .cover-links.expanded-links {
+	margin-top: 0.9rem; // increased for clearer separation
+}
+
+// Hide summary links when expanded
+.news-item.expanded .summary-links {
+	display: none;
+}
+
+// Reduce default margins for paragraphs injected from markdown
+.news-details p {
+	margin: 0 0 0.35rem 0;
+}
+
+.news-details p:last-child {
+	margin-bottom: 0;
+}
+
+// Ensure no extra space at bottom in expanded state
+.news-item.expanded .cover-links {
+	margin-top: 0.35rem;
+}
+
 @media screen and (max-width: $homepage-pre-mobile) {
 	#intro-wrapper, .feature-title, .feature-text, .intro-text, .home-hr {
 		grid-column: page !important;
@@ -237,12 +342,14 @@ $cv-icon-aspect-ratio: 1.33;
 }
 
 @media screen and (max-width: $mobile) {
-	#intro-image {
+	#intro-image-wrapper {
+		width: 5rem;
+		height: 5rem;
+	}
 
-		min-width: 5rem;  /* Prevent shrinking */
-		min-height: 5rem; /* Prevent shrinking */
-		max-width: 5rem;  /* Prevent expanding */
-		max-height: 5rem;
+	#intro-image {
+		width: 100%;
+		height: 100%;
 	}
 
 	#intro-title {
@@ -268,4 +375,39 @@ $cv-icon-aspect-ratio: 1.33;
 		font-weight: 500;
 	}
 
+	.news-summary {
+		-webkit-line-clamp: 3;
+	}
+	.news-summary-row {
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+	.summary-links {
+		margin-left: 0;
+		white-space: normal;
+	}
+
+	// Homepage news: switch to single column and stack links below summary
+	.news-wrapper .news-content-wrapper {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"date"
+			"summary"
+			"links"
+			"details";
+	}
+
+	.news-wrapper .news-summary {
+		display: block;
+		-webkit-line-clamp: unset;
+		-webkit-box-orient: initial;
+		overflow: visible;
+	}
+
+	.news-wrapper .summary-links {
+		justify-self: start;
+		align-self: start;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
 }

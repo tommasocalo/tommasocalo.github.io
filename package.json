@@ -1,7 +1,7 @@
 {
-  "name": "fredhohman.github.io",
+  "name": "tommasocalo.me",
   "version": "1.0.0",
-  "description": "Fred Hohman's website.",
+  "description": "Tommaso Calò's website.",
   "main": "index.js",
   "scripts": {
     "start": "bundle exec jekyll serve --livereload"

@@ -3,6 +3,7 @@ layout: post
 title: "Guest Lecture on End-User Development for User Interfaces at Worcester University"
 categories: [news]
 pdf: /assets/2024-eudui-worchester.pdf
+summary: "📚 Invited lecture on **End-User Development for User Interfaces** at Worcester University."
 
 ---
 

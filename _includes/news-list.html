@@ -1,20 +1,33 @@
-<div class="news-list">
+<div class="news-list l-page">
     {% assign sortedNews = site.categories.news | sort: 'date' | reverse %}
     {% for news in sortedNews %}
     <div class="news-item">
         <div class="news-content-wrapper">
             <div class="news-date">{{ news.date | date: "%B %d, %Y" }}</div>
-            <div class="news-content">{{ news.content }}</div>
+            <div class="news-details" style="display:block;">
+                {{ news.content }}
+                {% if news.projects or news.pdfs or news.project or news.pdf %}
+                <div class="cover-links expanded-links">
+                    <span class="pub-misc">
+                        {% if news.projects %}
+                            {% for link in news.projects %}
+                            <a href="{{ link }}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Project</a>
+                            {% endfor %}
+                        {% elsif news.project %}
+                            <a href="{{ news.project }}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Project</a>
+                        {% endif %}
+                        {% if news.pdfs %}
+                            {% for link in news.pdfs %}
+                            <a href="{{ link }}"><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</a>
+                            {% endfor %}
+                        {% elsif news.pdf %}
+                            <a href="{{ news.pdf }}"><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</a>
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% if news.pdf %}
-        <div class="cover-links">
-            <span class="pub-misc">
-                <a href="{{ news.pdf }}">
-                    <i class="fas fa-file-pdf" aria-hidden="true"></i> PDF
-                </a>
-            </span>
-        </div>
-        {% endif %}
     </div>
     {% endfor %}
 </div>
