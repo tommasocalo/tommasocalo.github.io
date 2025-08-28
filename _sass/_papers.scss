@@ -30,9 +30,10 @@ $author-image-size: 80px;
 
 #author-wrapper {
 	grid-column: 2 / 8;
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	grid-column-gap: 0.875rem;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.875rem;
 	margin-top: 1rem;
 	margin-bottom: 1rem;
 }
@@ -86,18 +87,23 @@ $author-image-size: 80px;
 
 #paper-materials {
 	grid-column: 2 / 8;
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
 }
 
 #paper-materials > a {
 	background-color: $white;
 	border-radius: 5rem;
-	padding: 0.75rem;
+	padding: 0.75rem 1.2rem;
 	margin: 0.25rem;
 	text-align: center;
-	grid-column: 1fr;
 	transition: all .2s ease-in-out;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 8.5rem;
 }
 
 #paper-materials > a:hover {
@@ -111,7 +117,7 @@ $author-image-size: 80px;
 @media screen and (max-width: $homepage-pre-mobile) {
 
 	#paper-materials {
-		grid-template-columns: repeat(3, 1fr);
+		justify-content: center;
 	}
 	
 }
@@ -123,7 +129,8 @@ $author-image-size: 80px;
 	}
 
 	#author-wrapper {
-		grid-template-columns: repeat(2, 1fr);
+		justify-content: center;
+		gap: 0.75rem;
 	}
 
 	.author {
@@ -153,7 +160,8 @@ $author-image-size: 80px;
 	}
 
 	#paper-materials {
-		grid-template-columns: repeat(2, 1fr);
+		justify-content: center;
+		gap: 0.5rem;
 	}
 	
 	#venue-bar {
