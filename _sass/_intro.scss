@@ -423,9 +423,23 @@ $cv-icon-aspect-ratio: 1.33;
 	}
 
 	.news-wrapper .summary-links {
-		justify-self: end;
-		align-self: start;
+		justify-self: center;
+		align-self: center;
 		flex-direction: column;
 		gap: 0.25rem;
 	}
+
+	// Stack the action buttons vertically within their wrapper on mobile
+	.news-wrapper .summary-links .pub-misc {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	// Ensure each button takes only its content width while stacking
+	.news-wrapper .cover-links.summary-links .pub-misc a {
+		width: max-content;
+	}
 }
+
