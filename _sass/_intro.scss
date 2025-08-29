@@ -408,12 +408,11 @@ $cv-icon-aspect-ratio: 1.33;
 
 	// Homepage news: switch to single column and stack links below summary
 	.news-wrapper .news-content-wrapper {
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr auto;
 		grid-template-areas:
-			"date"
-			"summary"
-			"links"
-			"details";
+			"date links"
+			"summary links"
+			"details details";
 	}
 
 	.news-wrapper .news-summary {
@@ -424,7 +423,7 @@ $cv-icon-aspect-ratio: 1.33;
 	}
 
 	.news-wrapper .summary-links {
-		justify-self: start;
+		justify-self: end;
 		align-self: start;
 		flex-direction: column;
 		gap: 0.25rem;
