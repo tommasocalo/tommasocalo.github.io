@@ -209,6 +209,8 @@ $cv-icon-aspect-ratio: 1.33;
 	max-width: 100%;
 	height: auto;
 	display: block;
+	border-radius: 1rem;
+	border: 1px solid $black-05;
 }
 
 .news-wrapper .news-content-wrapper {
