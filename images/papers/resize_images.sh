@@ -35,3 +35,5 @@ for image in *.{png,jpg,jpeg,PNG,JPG,JPEG}; do
 done
 
 echo "All images have been resized to 2:1 width:height ratio!"
+
+
