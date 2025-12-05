@@ -1,54 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tommaso Calò | Linktree</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="img.png" />
-    <!-- Font Awesome icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
-    <!-- Core theme CSS -->
-    <link rel="stylesheet" href="style.css">
-  </head>
 
-  <body>
-    <!-- Parallax Pixel Background Animation -->
-    <section class="animated-background">
-      <div id="stars1"></div>
-      <div id="stars2"></div>
-      <div id="stars3"></div>
-    </section>
-    <!-- End of Parallax Pixel Background Animation -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tommaso Calò | Linktree</title>
+  <!-- Font Awesome icons -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+  <!-- Core theme CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
 
-    <a id="profilePicture" href="#popup">
-      <img src="img.png" alt="Profile Picture">
-    </a>
+<body>
+  <!-- Anti-Design Creative Coding Background -->
+  <canvas id="antiCanvas"></canvas>
 
-
-
+  <div class="content-wrapper">
     <div id="userName">
-      @tommasocalo
+      <span class="glitch" data-text="@tommasocalo">@tommasocalo</span>
     </div>
 
     <div id="links">
-
       <a class="link" href="https://www.last.fm/user/tommasocalo" target="_blank">
-        <i class="fas fa-music">&nbsp;</i>Music
+        <span class="link-text"><i class="fas fa-music"></i>Music</span>
+        <span class="link-hover">LAST.FM →</span>
       </a>
       <a class="link" href="https://letterboxd.com/tommasocalo/" target="_blank">
-        <i class="fas fa-film">&nbsp;</i>Movies
+        <span class="link-text"><i class="fas fa-film"></i>Movies</span>
+        <span class="link-hover">LETTERBOXD →</span>
       </a>
       <a class="link" href="https://www.goodreads.com/user/show/188174383-tommaso-cal" target="_blank">
-        <i class="fas fa-book">&nbsp;</i>Books
+        <span class="link-text"><i class="fas fa-book"></i>Books</span>
+        <span class="link-hover">GOODREADS →</span>
       </a>
       <a class="link" href="https://www.strava.com/athletes/48764799" target="_blank">
-        <i class="fas fa-running">&nbsp;</i>Sport
+        <span class="link-text"><i class="fas fa-running"></i>Sport</span>
+        <span class="link-hover">STRAVA →</span>
       </a>
       <a class="link" href="https://tommasocalo.github.io/" target="_blank">
-        <i class="fas fa-briefcase">&nbsp;</i>Research
+        <span class="link-text"><i class="fas fa-briefcase"></i>Research</span>
+        <span class="link-hover">PORTFOLIO →</span>
       </a>
     </div>
 
-  </body>
+    <div class="footer-text">
+      <span class="scramble">ERROR_404_DESIGN_NOT_FOUND</span>
+    </div>
+  </div>
+
+  <script>
+    // Creative Coding Anti-Design Background
+    const canvas = document.getElementById('antiCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let time = 0;
+    let particles = [];
+    let shapes = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initShapes();
+    }
+
+    function initShapes() {
+      shapes = [];
+      // Generate random brutalist shapes
+      for (let i = 0; i < 15; i++) {
+        shapes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * 200 + 50,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.02,
+          type: Math.floor(Math.random() * 3),
+          strokeWidth: Math.random() * 4 + 1,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+
+      // Generate glitch lines
+      particles = [];
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          size: Math.random() * 100 + 20
+        });
+      }
+    }
+
+    function drawShape(shape) {
+      ctx.save();
+      ctx.translate(shape.x, shape.y);
+      ctx.rotate(shape.rotation);
+
+      const pulse = Math.sin(time * 2 + shape.phase) * 0.3 + 0.7;
+      ctx.strokeStyle = `rgba(255, 255, 255, ${pulse * 0.3})`;
+      ctx.lineWidth = shape.strokeWidth;
+
+      ctx.beginPath();
+      switch (shape.type) {
+        case 0: // Brutalist rectangle
+          ctx.strokeRect(-shape.size / 2, -shape.size / 4, shape.size, shape.size / 2);
+          break;
+        case 1: // Cross
+          ctx.moveTo(-shape.size / 2, 0);
+          ctx.lineTo(shape.size / 2, 0);
+          ctx.moveTo(0, -shape.size / 2);
+          ctx.lineTo(0, shape.size / 2);
+          break;
+        case 2: // Diagonal lines
+          for (let i = -2; i <= 2; i++) {
+            ctx.moveTo(-shape.size / 2 + i * 10, -shape.size / 2);
+            ctx.lineTo(shape.size / 2 + i * 10, shape.size / 2);
+          }
+          break;
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawGlitchLine(p) {
+      const glitch = Math.random() > 0.95;
+      if (glitch) {
+        ctx.fillStyle = `rgba(255, 0, 0, ${Math.random() * 0.5})`;
+        ctx.fillRect(p.x - p.size / 2, p.y, p.size, 2);
+      }
+
+      ctx.strokeStyle = `rgba(255, 255, 255, ${Math.random() * 0.1})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + p.size, p.y + Math.sin(time + p.x) * 20);
+      ctx.stroke();
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+
+      const gridSize = 50;
+      const offset = (time * 10) % gridSize;
+
+      for (let x = -gridSize + offset; x < width + gridSize; x += gridSize) {
+        const wobble = Math.sin(time + x * 0.01) * 5;
+        ctx.beginPath();
+        ctx.moveTo(x + wobble, 0);
+        ctx.lineTo(x - wobble, height);
+        ctx.stroke();
+      }
+    }
+
+    function drawNoise() {
+      if (Math.random() > 0.7) {
+        const noiseHeight = Math.random() * 10;
+        const y = Math.random() * height;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.1})`;
+        ctx.fillRect(0, y, width, noiseHeight);
+      }
+
+      // Occasional big glitch
+      if (Math.random() > 0.98) {
+        ctx.fillStyle = `rgba(${Math.random() > 0.5 ? '255,0,0' : '0,255,255'}, 0.1)`;
+        ctx.fillRect(Math.random() * width, 0, Math.random() * 200, height);
+      }
+    }
+
+    function animate() {
+      time += 0.01;
+
+      // Fade effect for trails
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, width, height);
+
+      drawGrid();
+
+      // Update and draw shapes
+      shapes.forEach(shape => {
+        shape.rotation += shape.rotSpeed;
+        shape.x += Math.sin(time + shape.phase) * 0.5;
+        shape.y += Math.cos(time + shape.phase) * 0.3;
+
+        // Wrap around
+        if (shape.x < -shape.size) shape.x = width + shape.size;
+        if (shape.x > width + shape.size) shape.x = -shape.size;
+        if (shape.y < -shape.size) shape.y = height + shape.size;
+        if (shape.y > height + shape.size) shape.y = -shape.size;
+
+        drawShape(shape);
+      });
+
+      // Update and draw glitch lines
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        drawGlitchLine(p);
+      });
+
+      drawNoise();
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    animate();
+
+    // Text scramble effect
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = '!<>-_\\/[]{}—=+*^?#_____';
+        this.update = this.update.bind(this);
+      }
+      setText(newText) {
+        const oldText = this.el.innerText;
+        const length = Math.max(oldText.length, newText.length);
+        const promise = new Promise((resolve) => this.resolve = resolve);
+        this.queue = [];
+        for (let i = 0; i < length; i++) {
+          const from = oldText[i] || '';
+          const to = newText[i] || '';
+          const start = Math.floor(Math.random() * 40);
+          const end = start + Math.floor(Math.random() * 40);
+          this.queue.push({ from, to, start, end });
+        }
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+      }
+      update() {
+        let output = '';
+        let complete = 0;
+        for (let i = 0, n = this.queue.length; i < n; i++) {
+          let { from, to, start, end, char } = this.queue[i];
+          if (this.frame >= end) {
+            complete++;
+            output += to;
+          } else if (this.frame >= start) {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span class="scramble-char">${char}</span>`;
+          } else {
+            output += from;
+          }
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) {
+          this.resolve();
+        } else {
+          this.frameRequest = requestAnimationFrame(this.update);
+          this.frame++;
+        }
+      }
+      randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      }
+    }
+
+    // Apply scramble effect to footer
+    const scrambleEl = document.querySelector('.scramble');
+    const fx = new TextScramble(scrambleEl);
+    const phrases = [
+      'RESIST_THE_ALGORITHM',
+      'TOUCH_GRASS_NOT_SCREENS',
+      'REAL_LIFE_>_TIMELINE',
+      'DELETE_THE_APPS____',
+      'YOUR_ATTENTION_IS_VALUABLE',
+      'DISCONNECT_TO_RECONNECT',
+      'BREAK_THE_SCROLL_LOOP',
+      'OFFLINE_IS_THE_NEW_LUXURY'
+    ];
+    let counter = 0;
+    const next = () => {
+      fx.setText(phrases[counter]).then(() => {
+        setTimeout(next, 3000);
+      });
+      counter = (counter + 1) % phrases.length;
+    };
+    next();
+  </script>
+</body>
+
 </html>
+</CodeContent>
+<parameter name="EmptyFile">false
