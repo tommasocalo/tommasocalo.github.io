@@ -1,13 +1,26 @@
-<div class="news-list l-page">
-    {% assign sortedNews = site.categories.news | sort: 'date' | reverse %}
-    {% for news in sortedNews %}
-    <div class="news-item">
-        <div class="news-content-wrapper">
-            <div class="news-date">{{ news.date | date: "%B %d, %Y" }}</div>
-            <div class="news-details" style="display:block;">
-                {{ news.content }}
+{% assign news_limit = include.limit | default: 999 %}
+{% assign news_variant = include.variant | default: "full" %}
+{% assign sortedNews = site.categories.news | sort: 'date' | reverse %}
+<div class="news-timeline-wrapper l-page{% if news_variant == 'home' %} news-timeline-wrapper--home{% endif %}">
+    <div class="news-timeline-spine" aria-hidden="true">
+        <svg class="news-timeline-spine__svg" preserveAspectRatio="none" viewBox="0 0 2 100">
+            <line class="news-timeline-spine__line" x1="1" x2="1" y1="0" y2="100" pathLength="1" />
+        </svg>
+    </div>
+    <ol class="news-timeline">
+        {% for news in sortedNews limit: news_limit %}
+        <li class="news-timeline__item">
+            <time class="news-timeline__date" datetime="{{ news.date | date_to_xmlschema }}">{{ news.date | date: "%b %-d, %Y" }}</time>
+            <div class="news-timeline__content">
+                <div class="news-timeline__summary">
+                    {% if news_variant == "home" and news.summary %}
+                        {{ news.summary | markdownify }}
+                    {% else %}
+                        {{ news.content }}
+                    {% endif %}
+                </div>
                 {% if news.projects or news.pdfs or news.project or news.pdf %}
-                <div class="cover-links expanded-links">
+                <div class="news-timeline__links cover-links">
                     <span class="pub-misc">
                         {% if news.projects %}
                             {% for link in news.projects %}
@@ -27,7 +40,7 @@
                 </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
-    {% endfor %}
+        </li>
+        {% endfor %}
+    </ol>
 </div>

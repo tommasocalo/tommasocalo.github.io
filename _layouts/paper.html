@@ -44,6 +44,10 @@ layout: default
 			{% if page.url %}
 			  <a href="{{ page.url }}"><div><i class="fas fa-link" aria-hidden="true"></i> Project</div></a>
 			{% endif %}
+
+			{% if page.website %}
+			  <a href="{{ page.website }}"><div><i class="fas fa-globe" aria-hidden="true"></i> Website</div></a>
+			{% endif %}
 		
 			{% if page.demo %}
 			  <a href="{{ page.demo }}"><div><i class="fas fa-play" aria-hidden="true"></i> Demo</div></a>
