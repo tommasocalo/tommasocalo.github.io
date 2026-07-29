@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fredhohman/fredhohman.github.io.git"
+    "url": "git+https://github.com/tommasocalo/tommasocalo.github.io.git"
   },
-  "author": "Fred Hohman",
+  "author": "Tommaso Calò",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fredhohman/fredhohman.github.io/issues"
+    "url": "https://github.com/tommasocalo/tommasocalo.github.io/issues"
   },
-  "homepage": "https://github.com/fredhohman/fredhohman.github.io#readme"
+  "homepage": "https://github.com/tommasocalo/tommasocalo.github.io#readme"
 }

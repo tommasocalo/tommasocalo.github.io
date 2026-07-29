@@ -1,7 +1,7 @@
 /* TEAM */
-	Author: Fred Hohman
-	Twitter: @fredhohman
-	Location: Seattle, United States
+	Author: Tommaso Calò
+	Twitter: @TommasoCalo1
+	Location: Copenhagen, Denmark
 
 /* SITE */
     Language: English
