@@ -1,44 +1,55 @@
 - institution: Politecnico Di Torino
-  position: Graduate Teaching Assistant
+  position: "MOOC “Human-AI Interaction” — Author and Instructor"
   location: "Turin, Italy"
-  year: Fall 2023
-  class: "Human Computer Interaction (02JSK)"
-  instructor: Luigi De Russis
-  description: "Mentored student team projects for Human Computer Interaction (02JSK), an Master's-level course with 119 students enrolled."
+  year: "Dec. 2025 — Feb. 2026"
+  description: "Designed and instructed a public Massive Open Online Course on Human-AI Interaction, funded by the EU Digital Education Hub."
   institution-url: https://www.polito.it/
+
+- institution: University of Eastern Piedmont
+  position: "Database — Contract Professor"
+  location: "Vercelli, Italy"
+  year: "Jan. 2026 — Feb. 2026"
+  description: "Lectured on SQL and relational design."
+  institution-url: https://www.uniupo.it/
+
+- institution: Politecnico Di Torino
+  position: "Human-AI Interaction — Co-Instructor"
+  location: "Turin, Italy"
+  year: "Jan. 2026 — Feb. 2026"
+  description: "Lectured on generative AI and UI design patterns to Ph.D. candidates."
+  institution-url: https://www.polito.it/
+
+- institution: Politecnico Di Torino
+  position: "Challenge@PoliTo by Reply — Project Mentor"
+  location: "Turin, Italy"
+  year: "Sep. 2025 — Jan. 2026"
+  description: "Mentored student teams on agentic solutions for industrial challenges proposed by Reply, in collaboration with the company."
+  institution-url: https://www.polito.it/
+
+- institution: ITS Foundation
+  position: "Python Programming for Aerospace — Lead Instructor"
+  location: "Turin, Italy"
+  year: "Sep. 2023 — Feb. 2026"
+  description: "Designed and taught the full Python curriculum to vocational students in the Mechatronics track."
+
+- institution: Politecnico Di Torino
+  position: "Human-Computer Interaction — Teaching Assistant"
+  location: "Turin, Italy"
+  year: "Sep. 2022 — Feb. 2026"
+  class: "Human Computer Interaction (02JSK)"
   class-url: https://elite.polito.it/teaching/02jsk-hci
+  instructor: Luigi De Russis
+  description: "Guided Computer Engineering students through the full design cycle each year, from user research to AI-driven prototyping."
+  institution-url: https://www.polito.it/
   ta: true
 
 - institution: Politecnico Di Torino
-  position: Graduate Teaching Assistant
+  position: "Computer Vision — Teaching Assistant"
   location: "Turin, Italy"
-  year: Spring 2023
-  class: "Image Processing and Computer vision (01TUJOV)"
-  instructor: Bartolomeo Montrucchio
-  description: "Mentored laboratory sessions for 'Image Processing and Computer Vision', a Master's-level course with 119 enrolled students."    
-  institution-url: https://www.polito.it/
+  year: "Feb. 2023 — Jul. 2023"
+  class: "Image Processing and Computer Vision (01TUJOV)"
   class-url: https://didattica.polito.it/pls/portal30/gap.pkg_guide.viewGap?p_cod_ins=01TUJOV&p_a_acc=2025&p_header=S&p_lang=IT&multi=N
-  ta: true
-
-- institution: Politecnico Di Torino
-  position: Graduate Teaching Assistant
-  location: "Turin, Italy"
-  year: Fall 2023
-  class: "Human Computer Interaction (02JSK)"
-  instructor: Luigi De Russis
-  description: "Mentored student team projects for Human Computer Interaction (02JSK), an MS course with 119 students enrolled."
+  instructor: Bartolomeo Montrucchio
+  description: "Led 12 hands-on laboratory sessions on image feature extraction, optics, and deep learning methods."
   institution-url: https://www.polito.it/
-  class-url: https://elite.polito.it/teaching/02jsk-hci
   ta: true
-
-- institution: Politecnico Di Torino
-  position: Graduate Teaching Assistant
-  location: "Turin, Italy"
-  year: Fall 2023
-  class: "Human Computer Interaction (02JSK)"
-  instructor: Luigi De Russis
-  description: "Mentored student team projects for Human Computer Interaction (02JSK), an MS course with 134 students enrolled."
-  institution-url: https://www.polito.it/
-  class-url: https://elite.polito.it/teaching/02jsk-hci
-  ta: true
-

@@ -1,13 +1,25 @@
-- name: "Top 5% Finisher - Ibiza Half Marathon"
-  description: "Finished in the top 5% of participants in the Ibiza Half Marathon"
+- name: "Outstanding Reviewer Recognition — ACM DIS"
+  description: "Recognized as an outstanding reviewer at the ACM Conference on Designing Interactive Systems"
+  year: 2026
+
+- name: "European Commission Seal of Excellence"
+  description: "Marie Skłodowska-Curie Postdoctoral Fellowships 2025, for the project GENUIS (score 94.60/100)"
   year: 2025
 
-- name: "3rd Place - Winter Sailing Championship"
-  description: "Third place finish in the Winter Sailing Championship"
-  year: 2024
+- name: "Best Late-Breaking Result Award — ACM EICS"
+  description: "ACM SIGCHI Symposium on Engineering Interactive Computing Systems, for \"Bridging Web and Figma\" (Russo, Calò, De Russis), as co-supervisor and ideator"
+  year: 2025
+
+- name: "CINECA ISCRA-C Computational Grants (×3)"
+  description: "Peer-reviewed competitive allocations from the Italian national supercomputing consortium, ~192,000 GPU-hours in total"
+  year: 2025
+
+- name: "Postdoctoral Fellowship (×2)"
+  description: "Merit-based postdoctoral research fellowships at Politecnico di Torino"
+  year: 2025
 
 - name: "PhD Scholarship"
-  description: "Three-year merit-based PhD scholarship at Politecnico di Torino"
+  description: "Merit-based PhD scholarship at Politecnico di Torino (2021 — 2025)"
   year: 2021
 
 - name: "PwC Cybersecurity Challenge"

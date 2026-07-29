@@ -1,8 +1,8 @@
 - id: email
-  description: "tommaso.calo@polito.it"
+  description: "tomcal@itu.dk"
   color: "#515151"
   class: "fas fa-envelope icon"
-  url: "mailto:tommaso.calo@polito.it"
+  url: "mailto:tomcal@itu.dk"
   on-homepage: true
   cv-group: 1
 

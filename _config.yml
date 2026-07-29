@@ -1,6 +1,6 @@
 title: Tommaso
-tagline: Postdoctoral Researcher at PoliTO
-url: http://tommasocalo.github.io
+tagline: Postdoctoral Researcher at the IT University of Copenhagen
+url: https://tommasocalo.github.io
 baseurl: ""
 # gems: [jekyll-paginate]
 # paginate: 5
@@ -15,8 +15,8 @@ sass:
 
 author:
   name: Tommaso
-  url: hhttp:/tommasocalo.github.io
-  email: tommaso.calo@polito.it
+  url: https://tommasocalo.github.io
+  email: tomcal@itu.dk
 
 markdown: kramdown
 highlighter: rouge

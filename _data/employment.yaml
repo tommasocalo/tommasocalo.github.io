@@ -1,0 +1,33 @@
+- position: Postdoctoral Researcher
+  institution: IT University of Copenhagen
+  institution-url: https://en.itu.dk/
+  location: "Copenhagen, Denmark"
+  year: "Mar. 2026 — Present"
+  description: "Research on design practices for generative user interfaces and on methods for improving generative UI systems."
+
+- position: Affiliated Researcher
+  institution: Pioneer Centre for AI
+  institution-url: https://www.aicentre.dk/
+  location: "Copenhagen, Denmark"
+  year: "Mar. 2026 — Present"
+  description: "Affiliated researcher at the Danish National Research Foundation flagship AI research centre."
+
+- position: Postdoctoral Researcher
+  institution: Politecnico Di Torino
+  institution-url: https://www.polito.it/
+  location: "Turin, Italy"
+  year: "Jul. 2025 — Feb. 2026"
+  group: e-Lite Research Group
+  group-url: https://elite.polito.it/
+  description: "Research on AI-assisted co-creation of interactive systems."
+
+- position: Visiting Scholar
+  institution: Georgia Institute of Technology
+  institution-url: https://www.gatech.edu/
+  location: "Atlanta, GA, USA"
+  year: "Feb. 2024 — Jul. 2024"
+  group: Teachable AI Lab
+  group-url: https://tail.cc.gatech.edu/
+  mentors:
+    - Christopher MacLellan
+  description: "Research on human-like learning in AI systems and on educator-driven authoring of intelligent tutoring systems."

@@ -1,0 +1,13 @@
+- name: AccessCoVE
+  funder: European Commission
+  funder-url: https://accesscove.eu/
+  years: "Nov. 2024 — Feb. 2026"
+  location: "Turin, Italy"
+  description: "Led the definition of AI-supported educational frameworks for inclusive participation."
+
+- name: AI-ALOE
+  funder: "NSF AI Institute for Adult Learning and Online Education (NSF & Accenture)"
+  funder-url: https://aialoe.org/
+  years: "Feb. 2024 — Jul. 2024"
+  location: "Atlanta, GA, USA"
+  description: "Contributed to the development of cognitive AI assistants for adult learning at Georgia Tech."

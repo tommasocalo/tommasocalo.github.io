@@ -1,0 +1,6 @@
+<div class="cv-left-date">{{ project.years }}</div>
+<div><b>{{ project.name }}</b></div>
+<div><i>{% if project.funder-url %}<a href="{{ project.funder-url }}">{{ project.funder }}</a>{% else %}{{ project.funder }}{% endif %}{% if project.location %}, {{ project.location }}{% endif %}</i></div>
+<div class="cv-description">{{ project.description }}</div>
+
+<div class="cv-spacer"></div>

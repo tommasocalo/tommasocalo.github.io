@@ -1,9 +1,20 @@
 - venue: ACM Conference on Human Factors in Computing Systems
   venue-shorthand: CHI
-  years:
-    - year: 2024
-      url: https://chi2024.acm.org/
-    - year: 2023
-      url: https://chi2023.acm.org/
-    - year: 2022
-      url: https://chi2022.acm.org/
+
+- venue: ACM Conference on Intelligent User Interfaces
+  venue-shorthand: IUI
+
+- venue: ACM SIGCHI Symposium on Engineering Interactive Computing Systems
+  venue-shorthand: EICS
+
+- venue: International Symposium on End-User Development
+  venue-shorthand: IS-EUD
+
+- venue: Proceedings of the ACM on Human-Computer Interaction
+  venue-shorthand: PACM-HCI
+
+- venue: ACM Conference on Learning at Scale
+  venue-shorthand: L@S
+
+- venue: ACM Conference on Designing Interactive Systems
+  venue-shorthand: DIS

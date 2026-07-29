@@ -1,22 +1,39 @@
+- name: Giuseppe Arbore
+  year: "2025 — Present"
+  degree: "Ph.D. in Computer Engineering, Politecnico Di Torino"
+  description: "Co-supervised with Prof. Luigi De Russis."
 
-- name: Andrea Silano
+- name: Lorenzo Cuccu
+  year: "2025"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "CAT-AI: An LLM-Based System for Creating Customized Didactical Exercises"
+
+- name: Simone Santarcangelo
+  year: "2025"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "Automatic Generation of Custom Web Prototypes from Sketches"
+
+- name: Andrea Sillano
   year: "Fall 2024"
-  degree: "MS.C. in Computer Science, Politecnico Di Torino"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "Generation of Tailored Graphical User Interfaces via Artificial Intelligence"
 
 - name: Francesca Russo
   year: "Fall 2024"
-  degree: "MS.C. in Computer Science, Politecnico Di Torino"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "GUI Representation Learning for Downstream Real-World Applications"
 
 - name: Filippo Castellarin
   year: "Fall 2024"
-  degree: "MS.C. in Computer Science, Politecnico Di Torino"
-
-- name: Ivan Dario Contreras Perez
-  year: "Spring 2024"
-  degree: "MS.C. in Computer Science, Politecnico Di Torino"
-  description: "Large Language Models for Ambiguity Detection and Resolution in Smart Homes"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "DeepBlocks: Visually Constructing, Debugging and Training Deep Neural Networks"
 
 - name: Giuseppe Salvi
   year: "Fall 2024"
-  degree: "MS.C. in Computer Science, Politecnico Di Torino"
-  description: "Web UI code generation: a transformer-based model applied to real-world screenshots"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "Web UI Code Generation: A Transformer-Based Model Applied to Real-World Screenshots"
+
+- name: Ivan Dario Contreras Perez
+  year: "Spring 2024"
+  degree: "M.Sc. in Computer Engineering, Politecnico Di Torino"
+  description: "Large Language Models for Ambiguity Detection and Resolution in Smart Homes"

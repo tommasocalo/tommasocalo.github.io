@@ -1,8 +1,8 @@
-<div><b>{{ title.name }}</b></div>
-
-{% for talk in title.items %}
 <div class="cv-left-date">{{ talk.month }} {{ talk.year }}</div>
-<div>{{ talk.location }}</div>
-{% endfor %}
+<div><b>{{ talk.title }}</b></div>
+<div><i>{{ talk.location }}</i></div>
+{% if talk.host %}
+	<div class="cv-description">Invited by {% include person.html person=talk.host %}</div>
+{% endif %}
 
 <div class="cv-spacer"></div>

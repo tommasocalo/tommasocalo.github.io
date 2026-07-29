@@ -1,0 +1,29 @@
+- role: Associate Chair
+  venue: ACM Conference on Human Factors in Computing Systems — Late-Breaking Work
+  venue-shorthand: CHI
+  years:
+    - year: 2025
+
+- role: Associate Chair
+  venue: ACM Conference on Intelligent User Interfaces
+  venue-shorthand: IUI
+  years:
+    - year: 2026
+
+- role: Associate Chair
+  venue: ACM International Conference on Advanced Visual Interfaces
+  venue-shorthand: AVI
+  years:
+    - year: 2026
+
+- role: Senior Program Committee
+  venue: ACM Conference on Human Factors in Computing Systems — Late-Breaking Work
+  venue-shorthand: CHI
+  years:
+    - year: 2025
+
+- role: Senior Program Committee
+  venue: ACM Conference on Intelligent User Interfaces
+  venue-shorthand: IUI
+  years:
+    - year: 2026

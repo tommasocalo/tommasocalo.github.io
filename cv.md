@@ -8,29 +8,10 @@ jsarr:
 
 <h1 id="cv-title"><a href="{{ site.url }}">Tommaso Calò</a></h1>
 
-<p id="cv-subtitle"><i>Ph.D. in Artificial Intelligence (<span class="cv-vis">HCI</span> + <span class="cv-ai">AI</span>)</i></p>
-
-<!-- <div id="cv-toc">
-<ul class="cv-description">
-	<li>Education</li>
-	<li>Industry Research</li>
-	<li>Academic Research</li>
-	<li>Honors and Awards</li>
-	<li>Publications</li>
-	<li>Talks</li>
-	<li>Press</li>
-	<li>Teaching</li>
-	<li>Mentoring</li>
-	<li>Grants and Funding</li>
-	<li>Interactive Articles</li>
-	<li>Service</li>
-	<li>Design</li>
-	<li>References</li>
-</ul>
-</div> -->
+<p id="cv-subtitle"><i>Postdoctoral Researcher — <span class="cv-vis">HCI</span> + <span class="cv-ai">AI</span></i></p>
 
 <div>
-My research aims to <b>democratize advanced AI tools</b> by bridging Human–Computer Interaction, visual programming, and program synthesis. I develop intuitive authoring environments, including sketch-to-code systems, multimodal design tools, and AI-powered educational interfaces, <b>enabling non-experts to harness complex technologies effortlessly</b>. My ongoing goal is to create adaptive, transparent AI interactions that empower users, fostering widespread computational creativity and narrowing the digital divide.
+My research bridges <b>Human–Computer Interaction</b> and <b>Artificial Intelligence</b> to make the creation of interactive systems accessible to everyone. I work on <b>end-user development</b> and the <b>generation of user interfaces</b>, building authoring environments — sketch-to-code systems, visual programming tools, multimodal design tools, and AI-powered educational interfaces — that let people specify, inspect, and refine software without having to write it. My current focus is on <b>generative user interfaces</b>: how designers actually work with them, and how to make what these systems produce observable, accountable, and controllable.
 </div>
 
 <div class="cv-spacer"></div>
@@ -62,26 +43,23 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% endfor %}
 {:/}
 
-## Professional Experience
+## Employment & Research Affiliations
 
-**Visiting Scholar** (Feb 2024 — Jul 2024)  
-*Georgia Institute of Technology*, Atlanta, USA  
-- Conducted research on human-like learning in AI systems under Prof. Christopher MacLellan
-- Developed novel approaches for educator-driven intelligent tutoring systems, published paper at L@S 2024 on AI-assisted tutor authoring
+{::nomarkdown}
+{% for experience in site.data.employment %}
+{% include cv/experience.html experience=experience %}
+{% endfor %}
+{:/}
 
-**Python Programming Instructor** (Sep 2023 — Dec 2023)  
-*ITS Foundation*, Turin, Italy  
-- Taught Python programming to 30 students with aerospace/mechatronics focus
+## Selected Research Projects
 
-**Teaching Assistant - Computer Vision** (Feb 2023 — Jul 2023)  
-*Politecnico di Torino*, Turin, Italy  
-- Led 12 hands-on labs for 80 students on algorithm implementation and ML integration
+{::nomarkdown}
+{% for project in site.data.projects %}
+{% include cv/project.html project=project %}
+{% endfor %}
+{:/}
 
-**Teaching Assistant - Human Computer Interaction** (Sep 2022 — Present)  
-*Politecnico di Torino*, Turin, Italy  
-- Guide 50+ students annually in developing and evaluating AI-driven user interfaces
-
-## Honors and Awards
+## Honors, Awards & Funding
 
 {% for award in site.data.awards %}
 {% include cv/award.html award=award %}
@@ -98,16 +76,7 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% include cv/publication.html pub=pub %}
 {% endfor %}
 
-<!-- ### All Publications -->
-
 {% assign selectedBoolForBibtex = false %}
-
-### Tech Report
-
-{% assign tech-report = site.categories.papers | where: 'type', "tech-report" %}
-{% for pub in tech-report %}
-{% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
-{% endfor %}
 
 ### Journal
 
@@ -123,10 +92,10 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
 {% endfor %}
 
-### Preprint
+### Extended Abstract
 
-{% assign preprint = site.categories.papers | where: 'type', "preprint" %}
-{% for pub in preprint %}
+{% assign extended-abstract = site.categories.papers | where: 'type', "extended-abstract" %}
+{% for pub in extended-abstract %}
 {% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
 {% endfor %}
 
@@ -137,26 +106,22 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
 {% endfor %}
 
-### Poster
+### Doctoral Dissertation
 
-{% assign poster = site.categories.papers | where: 'type', "poster" %}
-{% for pub in poster %}
-{% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
+<div><a href="{{ site.url }}/phd-thesis.pdf"><b>From Human Representations to AI Realization: Algorithms and Tools for Creating and Refining Interactive Systems</b></a></div>
+<div class="cv-description cv-authors">Tommaso Calò</div>
+<div class="cv-description"><i>Ph.D. Dissertation, Politecnico di Torino. Turin, Italy, 2025.</i></div>
+<div class="pub-misc"><a href="{{ site.url }}/phd-thesis.pdf"><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</a></div>
+
+<div class="cv-spacer-large"></div>
+
+## Invited Talks
+
+{::nomarkdown}
+{% for talk in site.data.talks %}
+{% include cv/talk.html talk=talk %}
 {% endfor %}
-
-### Demo
-
-{% assign demo = site.categories.papers | where: 'type', "demo" %}
-{% for pub in demo %}
-{% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
-{% endfor %}
-
-### Miscellaneous
-
-{% assign preprint = site.categories.papers | where: 'type', "misc" %}
-{% for pub in preprint %}
-{% include cv/publication.html pub=pub selectedBoolForBibtex=selectedBoolForBibtex %}
-{% endfor %}
+{:/}
 
 ## Teaching
 
@@ -164,7 +129,7 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% include cv/teaching.html teach=teach %}
 {% endfor %}
 
-## Mentoring
+## Supervision & Mentoring
 
 {::nomarkdown}
 {% for mentee in site.data.mentoring %}
@@ -172,26 +137,17 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% endfor %}
 {:/}
 
-## Certifications & Languages
-
-**TOEFL iBT**: 98/120 (C1 Level)  
-**Italian**: Native  
-**English**: Fluent (C1)
-
-<!-- ## Technology Skills
-
-{% for skill in site.data.skills %}
-{% include cv/skill.html skill=skill %}
-{% endfor %} -->
-
 ## Service
+
+<div class="cv-service-title"><b>Editorial & Judging Roles</b></div>
+{% for venue in site.data.committees %}
+{% include cv/venue.html venue=venue %}
+{% endfor %}
 
 <div class="cv-service-title"><b>Organizer</b></div>
 {% for venue in site.data.organizer %}
 {% include cv/venue.html venue=venue %}
 {% endfor %}
-
-
 
 <div class="cv-service-title"><b>Reviewer</b></div>
 {% for venue in site.data.reviewer %}
@@ -203,50 +159,16 @@ My research aims to <b>democratize advanced AI tools</b> by bridging Human–Com
 {% include cv/member.html member=member %}
 {% endfor %}
 
+## Certifications & Languages
+
+**TOEFL iBT**: 98/120 (C1 Level)  
+**Italian**: Native  
+**English**: Fluent (C1)
+
 ## References
 
 {% for reference in site.data.references %}
 {% include cv/reference.html reference=reference %}
 {% endfor %}
 
-<!-- 
-## Contact
-
-Fred Hohman  
-`fredhohman@gatech.edu`  
-CODA Tech Square  
-Georgia Tech  
-756 W Peachtree St NW  
-Atlanta, GA 30308
-<span style="background: linear-gradient(0deg, #34495e, #3498db); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: block">
-—  
-USA  
-Earth  
-Solar System  
-Milky Way  
-Local Group  
-Universe  
-</span> -->
-
-
 [cv]: {{ site.url }}/cv.pdf "My CV."
-
-[poloclub]: http://poloclub.gatech.edu "Polo Club of Data Science"
-[gt]: http://gatech.edu "Georgia Tech"
-[cse]: http://cse.gatech.edu "GT Computational Science and Engineering"
-[coc]: http://www.cc.gatech.edu "GT College of Computing"
-
-[fred]: http://fredhohman.com "Fred Hohman"
-[polo]: http://www.cc.gatech.edu/~dchau/ "Polo Chau"
-[alex]: http://va.gatech.edu/endert/ "Alex Endert"
-
-[jpl]: https://www.jpl.nasa.gov/ "NASA Jet Propulsion Lab"
-[hi]: https://www.hi.jpl.nasa.gov/ "Human Interfaces Group at NASA JPL"
-[pnnl]: https://www.pnnl.gov/ "Pacific Northwest National Laboratory"
-[dsa]: http://www.pnnl.gov/nationalsecurity/technical/capabilities/computing/data_sciences.stm "Data Sciences and Analytics Group at PNNL"
-[msr]: https://www.microsoft.com/en-us/research/ "Microsoft Research"
-[msr-hci]: https://www.microsoft.com/en-us/research/group/human-computer-interaction/ "HCI@MSR"
-
-[twitter]: https:/www.twitter.com/fredhohman "@fredhohman"
-[github]: https:/www.github.com/fredhohman "github.com/fredhohman"
-[nstrf]: https://www.nasa.gov/strg/nstrf "NASA Space Technology Research Fellowship"

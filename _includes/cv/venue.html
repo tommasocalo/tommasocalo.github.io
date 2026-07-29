@@ -1,5 +1,5 @@
 <div>
-	{{ venue.venue }}
+	{% if venue.role %}<b>{{ venue.role }}</b>, {% endif %}{{ venue.venue }}
 	{% if venue.venue-shorthand %}(<b>{{ venue.venue-shorthand }}</b>){% endif %} {% if venue.venue-at %}at {{ venue.venue-at }}{% endif %}
 	{% for year in venue.years %}
 		{% if year.url %}
