@@ -1,8 +1,8 @@
 <div class="cover">
 
 	<div class="cover-image">
-		<a href="{{ feature.url }}">
-			<img src="{{ feature.image }}">
+		<a href="{{ feature.url }}" tabindex="-1" aria-hidden="true">
+			<img src="{{ feature.image }}" alt="" loading="lazy" decoding="async">
 		</a>
 	</div>
 
@@ -19,7 +19,7 @@
 			<div class="cover-venue">
 				{% if feature.venue-shorthand %}
 				{{ feature.venue-shorthand }}
-				{% else if feature.venue %}
+				{% elsif feature.venue %}
 				{{ feature.venue }}
 				{% else %}
 				{{ feature.month }}

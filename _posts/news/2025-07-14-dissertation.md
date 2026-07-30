@@ -3,7 +3,7 @@ layout: post
 title: "PhD Dissertation Defense"
 categories: [news]
 summary: "🎓 I successfully defended my PhD dissertation on July 14."
-pdf: phd-thesis.pdf
+pdf: /phd-thesis.pdf
 
 ---
 

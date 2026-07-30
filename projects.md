@@ -15,7 +15,9 @@ Research publications for fans of Machine Learning and Human-Computer Interactio
 
 <div class="l-page project-grid">
     {% for project in site.categories.papers %}
+    {% if project.feature-title %}
     {% include project.html project=project %}
+    {% endif %}
     {% endfor %}
 </div>
 

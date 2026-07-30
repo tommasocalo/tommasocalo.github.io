@@ -14,6 +14,11 @@ html {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 16px;
   line-height: 1.5;
+  // The canvas takes the footer colour, so overscrolling past the end of a
+  // short page shows the footer continuing rather than a white void. Without
+  // this, body's background propagates to the canvas and the footer only
+  // paints its own box.
+  background-color: $footer-bg;
 }
 
 @media screen and (max-width: $mobile) {
@@ -27,6 +32,23 @@ body {
   background-color: $bg-color;
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
+  // Keep the footer at the bottom of short pages...
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // ...and keep the top overscroll page-coloured, since html is now dark.
+  box-shadow: 0 -100vh 0 $bg-color;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+// Visible keyboard focus. Pointer users never see it; keyboard users need it.
+:focus-visible {
+  outline: 2px solid $blue;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 img {
