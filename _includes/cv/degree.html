@@ -8,9 +8,9 @@
 	</div>
 {% endif %}
 
-{% if degree.advisor %}
+{% if degree.advisor or degree.co-advisor %}
 	<div class="cv-description">
-		Advisor: {% include person.html person=degree.advisor %}{% endif %}{% if degree.co-advisor %}, Co-advisor: {% include person.html person=degree.co-advisor %}
+		{% if degree.advisor %}Advisor: {% include person.html person=degree.advisor %}{% endif %}{% if degree.co-advisor %}{% if degree.advisor %}, {% endif %}Co-advisor: {% include person.html person=degree.co-advisor %}{% endif %}
 	</div>
 {% endif %}
 
