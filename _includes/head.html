@@ -22,6 +22,26 @@
     {% endif %}
   </title>
 
+  <!-- Theme. This must run before the stylesheet is linked, or the page paints
+       once in the wrong theme first. colorScheme is set inline for the same
+       reason: the stylesheet hasn't parsed yet, so the scrollbar would flash.
+       Wrapped in try/catch because Lockdown Mode throws on localStorage. -->
+  <meta name="theme-color" id="meta-theme-color" content="#ffffff">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var wantsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = (stored === 'light' || stored === 'dark') ? stored : (wantsDark ? 'dark' : 'light');
+        var root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        root.style.colorScheme = theme;
+        var m = document.getElementById('meta-theme-color');
+        if (m) m.setAttribute('content', theme === 'dark' ? '#15151A' : '#ffffff');
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="{{ site.baseurl }}/styles.css">
   <!-- <link rel="stylesheet" href="styles.css"> -->

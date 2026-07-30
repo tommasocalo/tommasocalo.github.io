@@ -2,6 +2,8 @@
 <html lang="{{ site.lang | default: "en-US" }}">
   {% include head.html %}
   <body>
+    {% if page.bg %}{% include bg.html %}{% endif %}
+    {% include theme-toggle.html %}
     {% include header.html %}
     <main>
       {{ content }}

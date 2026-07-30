@@ -5,6 +5,15 @@ footer {
 	padding-top: 3rem;
 	margin-top: 2em;
 	text-align: center;
+	border-top: 1px solid var(--border);
+
+	// The footer now follows the theme (light chrome in light, the original
+	// #1E1E24 in dark), so the old "inverted island" token overrides are gone:
+	// the ordinary accent works on both footer surfaces. html's background is
+	// $footer-bg too, so the bottom overscroll keeps matching automatically.
+	--text: var(--text-footer);
+	--text-subtle: var(--text-footer-muted);
+	--link-underline: var(--text-footer-muted);
 }
 
 #footer-center {

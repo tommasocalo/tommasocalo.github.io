@@ -1,0 +1,64 @@
+<button type="button" id="theme-toggle" class="theme-toggle" aria-label="Colour theme">
+  <span class="theme-toggle__icon" aria-hidden="true">
+    <svg class="theme-toggle__light" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6">
+      <circle cx="10" cy="10" r="3.6"/>
+      <path d="M10 1.6v2.2M10 16.2v2.2M18.4 10h-2.2M3.8 10H1.6M15.9 4.1l-1.6 1.6M5.7 14.3l-1.6 1.6M15.9 15.9l-1.6-1.6M5.7 5.7L4.1 4.1" stroke-linecap="round"/>
+    </svg>
+    <svg class="theme-toggle__dark" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6">
+      <path d="M16.5 12.4A7 7 0 0 1 7.6 3.5a7 7 0 1 0 8.9 8.9z" stroke-linejoin="round"/>
+    </svg>
+  </span>
+</button>
+<span id="theme-status" role="status" aria-live="polite" class="visually-hidden"></span>
+
+<script>
+(function () {
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  var status = document.getElementById('theme-status');
+  var root = document.documentElement;
+  var media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  // No stored choice means "whatever the OS says", and the site keeps following
+  // the OS live. The first time the visitor picks a theme themselves, that
+  // choice is written to localStorage and from then on it wins on every visit,
+  // on this browser, indefinitely.
+  function stored() {
+    try {
+      var v = localStorage.getItem('theme');
+      return (v === 'light' || v === 'dark') ? v : null;
+    } catch (e) { return null; }
+  }
+
+  function current() {
+    return stored() || (media.matches ? 'dark' : 'light');
+  }
+
+  function paint(theme, announce) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    btn.dataset.theme = theme;
+    var meta = document.getElementById('meta-theme-color');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#15151A' : '#ffffff');
+    var next = theme === 'dark' ? 'light' : 'dark';
+    btn.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+    btn.setAttribute('title', 'Switch to ' + next + ' theme');
+    if (announce && status) status.textContent = (theme === 'dark' ? 'Dark' : 'Light') + ' theme';
+  }
+
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    root.classList.add('theme-anim');
+    paint(next, true);
+    window.setTimeout(function () { root.classList.remove('theme-anim'); }, 220);
+  });
+
+  // Follow the OS live until the visitor has expressed a preference of their own,
+  // and mirror a choice made in another tab.
+  media.addEventListener('change', function () { if (!stored()) paint(current(), false); });
+  window.addEventListener('storage', function (e) { if (e.key === 'theme') paint(current(), false); });
+
+  paint(current(), false);
+})();
+</script>

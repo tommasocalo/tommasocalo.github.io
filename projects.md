@@ -1,5 +1,6 @@
 ---
 layout: page
+bg: true
 title: Projects
 permalink: projects/
 ---

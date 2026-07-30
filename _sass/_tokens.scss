@@ -1,0 +1,116 @@
+// Semantic colour tokens. Named by role, never by colour, so a token can be
+// re-pointed per theme or re-declared in a scope (see the footer island).
+//
+// The dark theme is not an inversion. It starts from #1E1E24 — the footer
+// colour this site already used — which becomes the raised/card surface, with
+// the page sitting below it at #15151A. Elevation therefore inverts direction:
+// light raises by getting darker, dark raises by getting lighter.
+
+@mixin theme-light {
+  --surface: #FFFFFF;              --surface-raised: #F7F7F9;
+  --surface-raised-hover: #F0F0F4; --surface-pill: #FFFFFF;
+  --surface-overlay: #FFFFFF;      --surface-footer: #F0F0F4;
+  --surface-media: #FFFFFF;        --accent-soft: #E4F2FF;  --award-soft: #FFF3D6;
+
+  --text: #3E3E45;                 --text-strong: #2B2B31;  --text-display: #16161B;
+  --text-muted: #55555D;           --text-subtle: #6E6E78;  --text-faint: #A6A6B0;
+  --text-on-accent: #FFFFFF;       --text-footer: #55555D;  --text-footer-muted: #6E6E78;
+
+  --border: #E1E1E6;               --border-strong: #C9C9D2; --border-subtle: #EDEDF1;
+  --timeline-spine: #DCDCE3;       --timeline-dot-border: #C9C9D2;
+
+  --accent: #2569C9;               --accent-hover: #00449E; --accent-contrast: #FFFFFF;
+  --accent-soft-text: #14549F;     --accent-halo: rgba(37,105,201,.16);
+  --focus: #2569C9;                --link-underline: #A6A6B0;
+
+  --award: #8A6200;                --ai: #C04A00;           --code-text: #A8384A;
+
+  --shadow-1: 0 4px 18px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.05);
+  --selection-bg: #CFE3FA;         --selection-text: #16161B;
+  --media-filter: none;
+
+  // Liquid glass, tuned against Apple's own imagery rather than recreations:
+  // on a light backdrop the clear material reads slightly DARKER than what is
+  // behind it (see the macOS clear-look widgets and dock), never whiter; the
+  // brightest thing about it is the hairline specular on the top rim; blur is
+  // minimal so the backdrop passes through and bends at the edge.
+  --glass-tint: rgba(20,24,32,.03);      --glass-tint-strong: rgba(20,24,32,.06);
+  --glass-hi: rgba(255,255,255,.85);     --glass-lo: rgba(20,24,30,.10);
+  --glass-edge: rgba(22,26,34,.12);
+  --glass-drop: 0 1px 2px rgba(20,24,30,.07), 0 10px 24px -14px rgba(20,24,30,.35);
+  --glass-sheen: rgba(255,255,255,.34);
+
+  // Generative background: two grid inks and a faint tint inside the lens.
+  --art-minor: rgba(20,24,30,.17);  --art-major: rgba(20,24,30,.32);
+  --art-wash:  rgba(37,105,201,.05);
+  --art-ink-rgb: 20 24 30;      --art-accent-rgb: 37 105 201;
+
+  --syn-keyword: #2B2B31; --syn-comment: #6E6E78; --syn-string: #A8384A; --syn-number: #0B6F6F;
+  --syn-name: #1D5E5E;    --syn-tag: #143A8C;     --syn-func: #8A1A1A;   --syn-class: #3B4A7A;
+  --syn-builtin: #0B5E86; --syn-err-text: #8A1A1A; --syn-err-bg: #F6E4E4;
+  --syn-ins-bg: #E4F6E7;  --syn-del-bg: #FBE6E6;
+}
+
+@mixin theme-dark {
+  --surface: #15151A;              --surface-raised: #1E1E24;
+  --surface-raised-hover: #26262F; --surface-pill: #2C2C36;
+  --surface-overlay: #232329;      --surface-footer: #1E1E24;
+  --surface-media: #FFFFFF;        --accent-soft: #16283C;  --award-soft: #2E2517;
+
+  --text: #DEDEE4;                 --text-strong: #F2F2F6;  --text-display: #FAFAFD;
+  --text-muted: #ADADB8;           --text-subtle: #9595A1;  --text-faint: #5E5E6A;
+  --text-on-accent: #10151C;       --text-footer: #DEDEE4;  --text-footer-muted: #9595A1;
+
+  --border: #2E2E37;               --border-strong: #3E3E4A; --border-subtle: #26262E;
+  --timeline-spine: #2E2E37;       --timeline-dot-border: #45454F;
+
+  --accent: #7FB3F2;               --accent-hover: #A8D0FB; --accent-contrast: #10151C;
+  --accent-soft-text: #9CC8FA;     --accent-halo: rgba(127,179,242,.18);
+  --focus: #7FB3F2;                --link-underline: #5E5E6A;
+
+  --award: #E8B23A;                --ai: #FF8A4C;           --code-text: #E88592;
+
+  --shadow-1: 0 4px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+  --selection-bg: #2C4A6E;         --selection-text: #F2F2F6;
+  --media-filter: brightness(.92) contrast(1.02);
+
+  // Dark glass is the inverse: a faint lift above the page, not a slab.
+  --glass-tint: rgba(215,225,245,.04);   --glass-tint-strong: rgba(215,225,245,.07);
+  --glass-hi: rgba(255,255,255,.30);     --glass-lo: rgba(0,0,0,.45);
+  --glass-edge: rgba(255,255,255,.14);
+  --glass-drop: 0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.65);
+  --glass-sheen: rgba(255,255,255,.15);
+
+  --art-minor: rgba(210,225,245,.14); --art-major: rgba(210,225,245,.26);
+  --art-wash:  rgba(127,179,242,.055);
+  --art-ink-rgb: 210 225 245;   --art-accent-rgb: 127 179 242;
+
+  --syn-keyword: #F2F2F6; --syn-comment: #8E8E9C; --syn-string: #E88592; --syn-number: #5BC8C8;
+  --syn-name: #64C8B4;    --syn-tag: #7FB3F2;     --syn-func: #F0908F;   --syn-class: #A9B4F0;
+  --syn-builtin: #6EC1E4; --syn-err-text: #F0908F; --syn-err-bg: #3A2224;
+  --syn-ins-bg: #14301F;  --syn-del-bg: #331A1C;
+}
+
+// Attribute selectors outrank the media query, so a manual choice always wins
+// regardless of source order.
+:root                     { color-scheme: light; @include theme-light; }
+@media (prefers-color-scheme: dark) {
+  :root                   { color-scheme: dark;  @include theme-dark;  }
+}
+:root[data-theme="light"] { color-scheme: light; @include theme-light; }
+:root[data-theme="dark"]  { color-scheme: dark;  @include theme-dark;  }
+
+@media print {
+  :root, :root[data-theme="dark"] { color-scheme: light; @include theme-light; }
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-text); }
+
+// Only applied while the theme is actually being switched, so the transition
+// never fires on first paint or on ordinary hovers.
+:root.theme-anim, :root.theme-anim *, :root.theme-anim *::before, :root.theme-anim *::after {
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease, fill .18s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root.theme-anim, :root.theme-anim * { transition: none !important; }
+}

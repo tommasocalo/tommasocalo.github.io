@@ -1,46 +1,128 @@
-{% assign news_limit = include.limit | default: 999 %}
+{% comment %}
+  News timeline — v2.
+
+  Parameters
+    limit    integer   how many entries to render          (default: all)
+    variant  string    "full" | "home"                     (default: "full")
+    years    boolean   group into year chapters + index    (default: true when variant=full)
+    body     string    "summary" | "full"                  (default: "summary")
+    motion   string    "off" | "snap" | "friction"         (default: site.news_motion, else "off")
+
+  Front matter it reads, all optional, all with a sane fallback so that not one
+  existing post in _posts/news/ needs editing:
+
+    headline:  short scan line          -> falls back to `title`
+    summary:   one sentence, markdown   -> falls back to the post body
+    kind:      paper|award|talk|milestone|release|update
+                                        -> inferred from title+summary if absent
+    link:      where the headline goes  -> falls back to the post's own URL
+    image:     thumbnail in the entry   -> omitted if absent
+    project: / projects: / pdf: / pdfs: -> unchanged from v1
+    links:     [{label,url,icon}]       -> new, for anything else
+{% endcomment %}
+
+{% assign news_limit   = include.limit   | default: 999 %}
 {% assign news_variant = include.variant | default: "full" %}
+{% assign news_body    = include.body    | default: "summary" %}
+{% comment %}
+  Motion is a homepage affordance only. On /news/ every entry is already
+  present and there are year chapters to jump with, so nothing is intercepted
+  there — the script still runs, but only to reveal entries and drive the year
+  scrollspy.
+{% endcomment %}
+{% comment %}
+  Two scripts read this markup and they must not both claim the wheel:
+  news-motion.js owns `data-motion` (page-level scroll behaviour, /news/ only),
+  news-carousel.js owns `data-carousel` (the homepage window). On the homepage
+  data-motion is therefore always "off", so news-motion.js does nothing but
+  reveal entries.
+{% endcomment %}
+{% assign news_motion = "off" %}
+{% if news_variant == "home" %}
+  {% assign news_carousel = include.motion | default: site.news_motion | default: "off" %}
+{% else %}
+  {% assign news_carousel = "off" %}
+{% endif %}
+{% if news_variant == "home" %}{% assign use_years = false %}{% else %}{% assign use_years = true %}{% endif %}
+{% if include.years == false %}{% assign use_years = false %}{% endif %}
+
 {% assign sortedNews = site.categories.news | sort: 'date' | reverse %}
-<div class="news-timeline-wrapper l-page{% if news_variant == 'home' %} news-timeline-wrapper--home{% endif %}">
-    <div class="news-timeline-spine" aria-hidden="true">
-        <svg class="news-timeline-spine__svg" preserveAspectRatio="none" viewBox="0 0 2 100">
-            <line class="news-timeline-spine__line" x1="1" x2="1" y1="0" y2="100" pathLength="1" />
-        </svg>
+{% assign newest_id = sortedNews.first.id %}
+{% assign shown = sortedNews | slice: 0, news_limit %}
+
+<div class="news{% if news_variant == 'home' %} news--home{% endif %} l-page"
+     data-motion="{{ news_motion }}"
+     data-carousel="{{ news_carousel }}"
+     data-count="{{ shown | size }}">
+
+  {% if use_years %}
+    {% assign byYear = shown | group_by_exp: "n", "n.date | date: '%Y'" %}
+    {% if byYear.size > 1 %}
+    <nav class="news-years" aria-label="Jump to year">
+      {% for y in byYear %}
+      <a class="news-years__chip" href="#news-{{ y.name }}" aria-current="false">{{ y.name }}<span class="news-years__n">{{ y.items | size }}</span></a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+  {% endif %}
+
+  <div class="news-snap-edge" aria-hidden="true"></div>
+
+  {% if news_variant == "home" %}<div class="news-carousel" data-window="{{ include.window | default: 3 }}">{% endif %}
+  <div class="news-timeline-wrapper{% if news_variant == 'home' %} news-timeline-wrapper--home{% endif %}">
+    <div class="news-spine" aria-hidden="true">
+      <div class="news-spine__prog"></div>
+      <div class="news-spine__pull"></div>
     </div>
-    <ol class="news-timeline">
-        {% for news in sortedNews limit: news_limit %}
-        <li class="news-timeline__item">
-            <time class="news-timeline__date" datetime="{{ news.date | date_to_xmlschema }}">{{ news.date | date: "%b %-d, %Y" }}</time>
-            <div class="news-timeline__content">
-                <div class="news-timeline__summary">
-                    {% if news_variant == "home" and news.summary %}
-                        {{ news.summary | markdownify }}
-                    {% else %}
-                        {{ news.content }}
-                    {% endif %}
-                </div>
-                {% if news.projects or news.pdfs or news.project or news.pdf %}
-                <div class="news-timeline__links cover-links">
-                    <span class="pub-misc">
-                        {% if news.projects %}
-                            {% for link in news.projects %}
-                            <a href="{{ link }}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Project</a>
-                            {% endfor %}
-                        {% elsif news.project %}
-                            <a href="{{ news.project }}"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Project</a>
-                        {% endif %}
-                        {% if news.pdfs %}
-                            {% for link in news.pdfs %}
-                            <a href="{{ link }}"><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</a>
-                            {% endfor %}
-                        {% elsif news.pdf %}
-                            <a href="{{ news.pdf }}"><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</a>
-                        {% endif %}
-                    </span>
-                </div>
-                {% endif %}
-            </div>
-        </li>
+
+    {% if use_years %}
+      {% for y in byYear %}
+      <section class="news-year" id="news-{{ y.name }}" aria-labelledby="news-{{ y.name }}-h">
+        <h2 class="news-year__head" id="news-{{ y.name }}-h">
+          <a class="news-year__link" href="#news-{{ y.name }}">{{ y.name }}</a>
+          <span class="news-year__n">{{ y.items | size }} {% if y.items.size == 1 %}entry{% else %}entries{% endif %}</span>
+        </h2>
+        <ol class="news-timeline">
+          {% for news in y.items %}
+            {% include news-entry.html news=news newest_id=newest_id news_body=news_body date_format="%b %-d" %}
+          {% endfor %}
+        </ol>
+      </section>
+      {% endfor %}
+    {% else %}
+      <ol class="news-timeline">
+        {% for news in shown limit: news_limit %}
+          {% include news-entry.html news=news newest_id=newest_id news_body=news_body date_format="%b %-d, %Y" %}
         {% endfor %}
-    </ol>
+      </ol>
+    {% endif %}
+  </div>
+  {% if news_variant == "home" %}</div>{% endif %}
+
+  <div class="news-snap-edge" aria-hidden="true"></div>
+
+  {% if news_variant == "home" %}
+  {% comment %}
+    Touch pager. On a coarse pointer there is no wheel to lean on and no hover
+    to discover an affordance with, so the window is paged with a visible
+    control instead — a screenful at a time, not one entry. Hidden until the
+    script decides this is a touch device.
+  {% endcomment %}
+  <div class="news-foot">
+    <div class="news-pager" hidden>
+      <button type="button" class="news-pager__btn" data-dir="-1" aria-label="Show newer entries" disabled>
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5L10 7.5l5 5"/></svg>
+      </button>
+      <button type="button" class="news-pager__btn" data-dir="1" aria-label="Show older entries">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7.5l5 5 5-5"/></svg>
+      </button>
+      <span class="news-pager__pos" aria-live="polite"></span>
+    </div>
+
+    <a class="news-more" href="{{ site.baseurl }}/news">All news <span aria-hidden="true">&rarr;</span></a>
+  </div>
+  {% endif %}
 </div>
+
+<script src="{{ site.baseurl }}/assets/js/news-motion.js" defer></script>
+{% if news_variant == "home" %}<script src="{{ site.baseurl }}/assets/js/news-carousel.js" defer></script>{% endif %}

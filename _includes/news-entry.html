@@ -1,0 +1,90 @@
+{% comment %}
+  One timeline entry. Called only from news-list.html.
+  Params: news, newest_id, news_body, date_format
+{% endcomment %}
+
+{% assign n = include.news %}
+
+{% comment %} ---- kind, inferred so no existing post needs a `kind:` key ---- {% endcomment %}
+{% assign kind = n.kind %}
+{% if kind == nil or kind == "" %}
+  {% comment %} headline first: once a post has one, the title is often just a
+     bare project name and carries none of the signal. {% endcomment %}
+  {% assign hay = n.headline | append: " " | append: n.title | append: " " | append: n.summary | downcase %}
+  {% if hay contains "award" or hay contains "🏆" or hay contains "best paper" %}
+    {% assign kind = "award" %}
+  {% elsif hay contains "defended" or hay contains "dissertation" or hay contains "joined" or hay contains "started as" or hay contains "visit" %}
+    {% assign kind = "milestone" %}
+  {% elsif hay contains "accepted" or hay contains "published" or hay contains "paper" or hay contains "journal" %}
+    {% assign kind = "paper" %}
+  {% elsif hay contains "talk" or hay contains "lecture" or hay contains "presented" or hay contains "keynote" or hay contains "poster" or hay contains "workshop" %}
+    {% assign kind = "talk" %}
+  {% elsif hay contains "released" or hay contains "open-source" or hay contains "dataset" or hay contains "code" %}
+    {% assign kind = "release" %}
+  {% else %}
+    {% assign kind = "update" %}
+  {% endif %}
+{% endif %}
+{% case kind %}
+  {% when "paper" %}{% assign kind_label = "Paper" %}
+  {% when "award" %}{% assign kind_label = "Award" %}
+  {% when "talk" %}{% assign kind_label = "Talk" %}
+  {% when "milestone" %}{% assign kind_label = "Milestone" %}
+  {% when "release" %}{% assign kind_label = "Release" %}
+  {% else %}{% assign kind_label = "Update" %}
+{% endcase %}
+
+{% assign headline = n.headline | default: n.title %}
+{% assign target = n.link | default: n.url %}
+
+<li class="news-timeline__item{% if n.id == include.newest_id %} is-newest{% endif %}"
+    id="news-e-{{ n.slug }}"
+    data-kind="{{ kind }}">
+
+  <div class="news-timeline__meta">
+    <time class="news-timeline__date" datetime="{{ n.date | date_to_xmlschema }}">{{ n.date | date: include.date_format }}</time>
+    <span class="news-timeline__kind">{{ kind_label }}</span>
+  </div>
+
+  <div class="news-timeline__content">
+    {% if headline and headline != "" %}
+    <h3 class="news-timeline__title">
+      {% if n.nolink %}{{ headline }}{% else %}<a href="{{ target }}">{{ headline }}</a>{% endif %}
+    </h3>
+    {% endif %}
+
+    <div class="news-timeline__summary">
+      {% if include.news_body == "full" %}
+        {{ n.content }}
+      {% elsif n.summary and n.summary != "" %}
+        {{ n.summary | markdownify }}
+      {% else %}
+        {{ n.content }}
+      {% endif %}
+    </div>
+
+    {% if n.image %}
+    <a class="news-timeline__media" href="{{ target }}"><img src="{{ n.image }}" alt="{{ n.image_alt | default: headline }}" loading="lazy" decoding="async"></a>
+    {% endif %}
+
+    {% if n.projects or n.pdfs or n.project or n.pdf or n.links %}
+    <div class="news-timeline__links">
+      {% if n.projects %}{% for l in n.projects %}
+        <a href="{{ l }}"{% if l contains '://' %} target="_blank" rel="noopener"{% endif %}><i class="fas fa-external-link-alt" aria-hidden="true"></i>Project</a>
+      {% endfor %}{% elsif n.project %}
+        <a href="{{ n.project }}"{% if n.project contains '://' %} target="_blank" rel="noopener"{% endif %}><i class="fas fa-external-link-alt" aria-hidden="true"></i>Project</a>
+      {% endif %}
+
+      {% if n.pdfs %}{% for l in n.pdfs %}
+        <a href="{{ l }}"{% if l contains '://' %} target="_blank" rel="noopener"{% endif %}><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF</a>
+      {% endfor %}{% elsif n.pdf %}
+        <a href="{{ n.pdf }}"{% if n.pdf contains '://' %} target="_blank" rel="noopener"{% endif %}><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF</a>
+      {% endif %}
+
+      {% if n.links %}{% for l in n.links %}
+        <a href="{{ l.url }}"{% if l.url contains '://' %} target="_blank" rel="noopener"{% endif %}><i class="fas {{ l.icon | default: 'fa-link' }}" aria-hidden="true"></i>{{ l.label }}</a>
+      {% endfor %}{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</li>

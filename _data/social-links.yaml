@@ -1,6 +1,7 @@
 - id: email
   description: "tomcal@itu.dk"
   color: "#515151"
+  color-dark: "#DEDEE4"
   class: "fas fa-envelope icon"
   url: "mailto:tomcal@itu.dk"
   on-homepage: true
@@ -9,6 +10,7 @@
 - id: twitter
   description: "@TommasoCalo1"
   color: "#1da1f2"
+  color-dark: "#DEDEE4"
   class: "fab fa-twitter icon"
   url: https://twitter.com/TommasoCalo1
   on-homepage: true
@@ -17,6 +19,7 @@
 - id: github
   description: "@tommasocalo"
   color: "#6e5494"
+  color-dark: "#DEDEE4"
   class: "fab fa-github icon"
   url: "https://github.com/tommasocalo"
   on-homepage: true
@@ -25,6 +28,7 @@
 - id: linkedin
   description: "tommasocalo"
   color: "#0077b5"
+  color-dark: "#DEDEE4"
   class: "fab fa-linkedin-in icon"
   url: "http://www.linkedin.com/in/tommasocalo"
   on-homepage: true
@@ -33,6 +37,7 @@
 - id: home
   description: "tommasocalo.github.io"
   color: "#515151"
+  color-dark: "#DEDEE4"
   class: "fas fa-home icon"
   url: "https://tommasocalo.github.io"
   on-homepage: false
@@ -41,6 +46,7 @@
 - id: scholar
   description: "Google Scholar"
   color: "#515151"
+  color-dark: "#DEDEE4"
   class: "fa fa-graduation-cap icon"
   url: "https://scholar.google.com/citations?user=XRQkBEAAAAAJ&hl=it"
   on-homepage: true
@@ -49,6 +55,7 @@
 - id: cv
   description: CV PDF
   color: "#ba2818"
+  color-dark: "#DEDEE4"
   class: "far fa-file-pdf icon"
   url: "/cv.pdf"
   on-homepage: false
@@ -57,6 +64,7 @@
 - id: cv-web
   description: CV
   color: "#515151"
+  color-dark: "#DEDEE4"
   class: "fa fa-address-card icon"
   url: "/cv"
   on-homepage: false

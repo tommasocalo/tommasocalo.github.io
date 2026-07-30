@@ -32,3 +32,9 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-redirect-from
+
+# Latest News scroll behaviour: off | snap | friction
+news_motion: friction
+
+# Ambient background: sketch | none
+background_art: sketch

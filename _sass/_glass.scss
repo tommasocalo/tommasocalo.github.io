@@ -1,0 +1,207 @@
+// Liquid glass, second pass — built by looking at Apple's own imagery.
+//
+// What the pictures actually show, and the first attempt got wrong:
+//  * on light backdrops the material is a slight DARKENING, never a white fill
+//    (white-on-white was invisible);
+//  * the interior is nearly clear — minimal blur, so what is behind passes
+//    through and visibly bends at the rim (Chromium gets the real refraction,
+//    others keep a light frost);
+//  * the brightest element is a crisp specular on the top rim, with a soft
+//    counter-shade on the bottom inner edge — that curvature shading is what
+//    sells "glass" even over quiet areas;
+//  * it floats on a tight contact shadow plus a soft one, not a big blob.
+
+%glass {
+	background-color: var(--glass-tint);
+	border: 1px solid var(--glass-edge);
+	// Barely any blur: a 1px sketch stroke does not survive frosting, and a
+	// glass you cannot see through is a panel.
+	-webkit-backdrop-filter: blur(0.5px) saturate(1.4);
+	backdrop-filter: blur(0.5px) saturate(1.4);
+	box-shadow:
+		inset 0 1px 0 var(--glass-hi),
+		inset 0 -1px 1px var(--glass-lo),
+		var(--glass-drop);
+}
+
+.cover,
+#masthead nav > a,
+#everything-else > a,
+.social-link,
+.theme-toggle,
+.news-pager__btn {
+	@extend %glass;
+	// NO position here. This group once carried `position: relative` for the
+	// retired optical pseudo-layers, and — imported after the component
+	// partials — it silently overrode the theme toggle's position: fixed,
+	// throwing it into the flow at the left edge. Positioning belongs to the
+	// components, not to the material.
+}
+
+.cover { position: relative; }
+
+// The children sit above the optical layers.
+.cover > *,
+#masthead nav > a > *,
+#everything-else > a > *,
+.social-link > *,
+.theme-toggle > *,
+.news-pager__btn > * {
+	position: relative;
+	z-index: 1;
+}
+
+// THE LOCAL OPTIC. The body of the material stays frosted; under the pointer
+// it turns into true clear glass — blur drops away and the displacement lens
+// bends what is behind — inside a radial mask that follows the cursor
+// (--mx/--my fed by assets/js/glass.js). The material's transparency changes
+// locally; nothing is painted on top. Safari cannot take url() in a backdrop,
+// so it gets a local clarity/saturation spot instead — weaker, same idea.
+.cover::before,
+#masthead nav > a::before,
+#everything-else > a::before,
+.social-link::before,
+.theme-toggle::before,
+.news-pager__btn::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	z-index: 0;
+	pointer-events: none;
+	-webkit-backdrop-filter: saturate(1.6);
+	backdrop-filter: saturate(1.6);
+	backdrop-filter: url(#lg-lens) saturate(1.5);
+	-webkit-mask-image: radial-gradient(230px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.7) 40%, transparent 68%);
+	        mask-image: radial-gradient(230px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.7) 40%, transparent 68%);
+	opacity: 0;
+	transition: opacity .3s ease;
+}
+
+// Displacement scale is absolute pixels: small chrome gets the gentler lens
+// and a tighter spot.
+#masthead nav > a::before,
+#everything-else > a::before,
+.social-link::before,
+.theme-toggle::before,
+.news-pager__btn::before {
+	backdrop-filter: url(#lg-lens-sm) saturate(1.5);
+	-webkit-mask-image: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.7) 45%, transparent 72%);
+	        mask-image: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%), #000 0%, rgba(0,0,0,.7) 45%, transparent 72%);
+}
+
+.cover:hover::before,
+#masthead nav > a:hover::before,
+#everything-else > a:hover::before,
+.social-link:hover::before,
+.theme-toggle:hover::before,
+.news-pager__btn:hover::before {
+	opacity: 1;
+}
+
+// A faint specular rides with the optic — the light component of the touch.
+.cover::after,
+#masthead nav > a::after,
+#everything-else > a::after,
+.social-link::after,
+.theme-toggle::after,
+.news-pager__btn::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: radial-gradient(170px circle at var(--mx, 50%) var(--my, 50%),
+		var(--glass-sheen), transparent 60%);
+	opacity: 0;
+	transition: opacity .25s ease;
+	pointer-events: none;
+}
+
+.cover:hover::after,
+#masthead nav > a:hover::after,
+#everything-else > a:hover::after,
+.social-link:hover::after,
+.theme-toggle:hover::after,
+.news-pager__btn:hover::after {
+	opacity: 1;
+}
+
+.cover {
+	border-radius: 16px;
+	transition: background-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+// Hover: the lens engages in the canvas beneath and the panel dilates a
+// touch, same body language as the pills. No shadow bloom, no tint change.
+.cover:hover {
+	transform: translateY(-1px) scale(1.02);
+}
+
+
+
+// --- chips (Project / PDF / DOI) -----------------------------------------
+// Not glass. At 20px tall the rim band smears and a frosted border reads as
+// cheap — exactly the complaint. Chips are plain, crisp chrome: quiet solid
+// surface, hairline, and a full accent fill on hover with no underline.
+#cv .pub-misc a,
+.news-timeline__links .pub-misc a,
+.cover-links > .pub-misc > a {
+	background-color: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+	border: 1px solid var(--border);
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+#cv .pub-misc a:hover,
+.news-timeline__links .pub-misc a:hover,
+.cover-links > .pub-misc > a:hover {
+	background-color: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-contrast) !important;
+	text-decoration: none;
+}
+
+// --- honesty switches ----------------------------------------------------
+@media (prefers-reduced-transparency: reduce) {
+	.cover, #masthead nav > a, #everything-else > a, .social-link,
+	.theme-toggle, .news-pager__btn {
+		background-color: var(--surface-raised);
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+	.cover::before, #masthead nav > a::before, #everything-else > a::before,
+	.social-link::before, .theme-toggle::before, .news-pager__btn::before {
+		display: none;
+	}
+}
+
+@media print {
+	.cover { background-color: #fff; box-shadow: none; }
+}
+
+// No painted light. The complaint was right: a white radial reads as a lamp,
+// not as glass. The hover is the lens above and nothing else.
+.cover::after, #masthead nav > a::after, #everything-else > a::after,
+.social-link::after, .theme-toggle::after, .news-pager__btn::after {
+	display: none;
+}
+
+// The CSS optical spot is retired: in browsers without SVG-in-backdrop it
+// degraded to a saturation disc — the "halo". The real optics live in the
+// background canvas now (see bg.js): the glass hands the lens to the medium.
+.cover::before, #masthead nav > a::before, #everything-else > a::before,
+.social-link::before, .theme-toggle::before, .news-pager__btn::before {
+	display: none;
+}
+
+// The component partials still carry their pre-glass opaque hovers
+// ($black-05 / --surface-raised-hover). On glass, hover stays glass: the
+// tint deepens one translucent step and the lens beneath does the rest.
+#masthead nav > a:hover,
+#everything-else > a:hover,
+.social-link:hover,
+.theme-toggle:hover,
+.news-pager__btn:hover {
+	background-color: var(--glass-tint-strong);
+}

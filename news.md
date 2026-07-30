@@ -1,5 +1,6 @@
 ---
 layout: page
+bg: true
 title: News
 permalink: news/
 ---
@@ -14,39 +15,6 @@ Recent updates, achievements, and announcements.
     </svg>
 </button>
 
-<script>
-(function() {
-    var btn = document.querySelector('.news-jump');
-    if (!btn) return;
-    var timeline = document.querySelector('.news-timeline');
-    if (!timeline) return;
-
-    function update() {
-        var scrolled = window.scrollY || document.documentElement.scrollTop;
-        var max = (document.documentElement.scrollHeight - window.innerHeight);
-        var visible = scrolled > 180;
-        btn.classList.toggle('is-visible', visible);
-        var nearBottom = scrolled > max - 240;
-        btn.dataset.state = nearBottom ? 'up' : 'down';
-        btn.setAttribute('aria-label', nearBottom ? 'Jump to latest' : 'Jump to oldest');
-    }
-
-    btn.addEventListener('click', function() {
-        var nearBottom = btn.dataset.state === 'up';
-        window.scrollTo({
-            top: nearBottom ? 0 : document.documentElement.scrollHeight,
-            behavior: 'smooth'
-        });
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.target.matches('input, textarea, [contenteditable]')) return;
-        if (e.key === 'j') window.scrollBy({ top: 240, behavior: 'smooth' });
-        if (e.key === 'k') window.scrollBy({ top: -240, behavior: 'smooth' });
-    });
-
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
-})();
-</script>
+<!-- The inline script that used to live here (jump button + j/k) moved into
+     assets/js/news-motion.js, so that j/k cannot be handled twice when the
+     friction mode is on. -->

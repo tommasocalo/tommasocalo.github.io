@@ -1,44 +1,204 @@
-// Inline timeline for news entries.
-// Shared between the homepage preview and the /news page via the
-// `news-list.html` include — toggle the compact variant with the
-// `news-timeline-wrapper--home` modifier.
+// News timeline — v2.
 //
-// Spine is a single SVG <line> absolutely positioned so it's always
-// continuous regardless of item count. Dots sit on top as CSS ::before
-// elements. Both line and dots animate in on page load.
+// Shared between the homepage preview and /news/ through `news-list.html`.
+// The `--home` modifier gives the compact three-entry variant.
+//
+// What changed from v1, and why:
+//
+//  * The entry now has a HEADLINE. v1 rendered the whole post body with bold
+//    fragments doing the job of a title, which reads fine at nine entries and
+//    turns into an undifferentiated wall at fifty. `title` front matter was
+//    being computed and thrown away; now it is the scan target and the link to
+//    the post.
+//  * Entries are grouped into YEAR CHAPTERS whose headers are sticky and are
+//    their own permalink, with an entry count. Plus an inline year index at the
+//    top — pure anchors, works with JS off.
+//  * The date gutter became a METADATA RAIL (date + kind) and it is `sticky`,
+//    so on a tall entry the date tracks with the text instead of sliding out of
+//    view. The dot rides with it, so the two never come apart.
+//  * Only the newest dot carries the accent. In v1 every dot lit on hover and
+//    nothing was ever emphasised at rest, so "what is new" was unanswerable.
+//  * The load-time stagger is gone. A cascade whose length grows with the
+//    archive is the wrong mechanism; this reveals each entry once, on first
+//    entry into the viewport, via IntersectionObserver, and never again.
+//    Nothing is hidden unless the script has actually run — see `.js-news`.
+//
+// Geometry lives in custom properties on `.news` so the motion script can read
+// the same numbers the CSS uses.
 
-$news-date-col: 6.5rem;
-$news-gap: 2rem;
-$news-dot-size: 10px;
+.news {
+    --news-date-col: 6.5rem;
+    --news-gap: 2rem;
+    --news-dot: 9px;
+    --news-indent: 1.75rem;
+    --news-top: 0px;          // set this if a sticky site header is ever added
+    --news-stick: calc(var(--news-top) + 3.4rem); // where the metadata rail parks
+    --news-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
+    position: relative;
+}
+
+// Year index ---------------------------------------------------------------
+// Plain anchors. No JS required to work; JS only adds `aria-current`.
+.news-years {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 1.5rem 0 0.35rem;
+    padding-left: calc(var(--news-date-col) + var(--news-gap) + var(--news-indent));
+}
+
+.news-years__chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+    padding: 0.2rem 0.6rem;
+    border-radius: 1rem;
+    color: var(--text-subtle);
+    background: transparent;
+    border: 1px solid transparent;
+    text-decoration: none;
+    transition: color 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.news-years__chip:hover {
+    color: var(--accent);
+    border-color: var(--border);
+    text-decoration: none;
+}
+
+.news-years__chip[aria-current="true"] {
+    color: var(--text-strong);
+    background: var(--surface-raised);
+}
+
+.news-years__n {
+    font-size: 0.64rem;
+    font-weight: 500;
+    color: var(--text-faint);
+}
+
+.news-years__chip[aria-current="true"] .news-years__n {
+    color: var(--text-subtle);
+}
+
+// Wrapper & spine ----------------------------------------------------------
 .news-timeline-wrapper {
     position: relative;
-    margin: 2.25rem 0 0.5rem;
+    margin: 1rem 0 0.5rem;
+    // Only ever driven by the boundary rubber band; 0 the rest of the time.
+    transition: transform 0.3s var(--news-ease);
 }
 
 .news-timeline-wrapper--home {
     margin: 1.35rem 0 0.25rem;
 }
 
-// Spine -------------------------------------------------------------------
-.news-timeline-spine {
+.news.is-banding .news-timeline-wrapper {
+    transition: none;
+}
+
+.news-spine {
     position: absolute;
-    top: 0.55rem;
-    bottom: 0.55rem;
-    left: calc(#{$news-date-col} + #{$news-gap} - 0.5px);
+    top: 0.6rem;
+    bottom: 0.6rem;
+    left: calc(var(--news-date-col) + var(--news-gap) - 0.5px);
     width: 1px;
-    background: $border-color;
-    transform-origin: top center;
-    animation: news-spine-draw 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s forwards;
+    background: var(--timeline-spine);
     pointer-events: none;
+    z-index: 0;
 }
 
-@keyframes news-spine-draw {
-    from { transform: scaleY(0); }
-    to   { transform: scaleY(1); }
+// How far down the record you are. Decorative: absent without JS.
+.news-spine__prog {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0.35;
+    transform: scaleY(0);
+    transform-origin: top center;
 }
 
-// List & items ------------------------------------------------------------
+// The friction made visible: a short accent segment that grows out of the
+// current dot towards the one you are pulling. Zero height when at rest.
+.news-spine__pull {
+    position: absolute;
+    left: -1px;
+    width: 3px;
+    height: 0;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0;
+    top: 0;
+}
+
+// Year chapters ------------------------------------------------------------
+.news-year {
+    position: relative;
+    scroll-margin-top: 4.5rem;
+}
+
+.news-year__head {
+    position: sticky;
+    top: var(--news-top);
+    z-index: 4;
+    margin: 0;
+    display: grid;
+    grid-template-columns: var(--news-date-col) 1fr;
+    column-gap: var(--news-gap);
+    align-items: baseline;
+    padding: 0.75rem 0 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    // Fades out rather than cutting, so the spine keeps reading as continuous.
+    background: linear-gradient(to bottom, var(--surface) 64%, transparent);
+}
+
+.news-year__link {
+    position: relative;
+    text-align: right;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-strong);
+    text-decoration: none;
+}
+
+.news-year__link:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+// The permalink affordance stays out of the way until you go looking for it.
+// Absolutely positioned so the hidden state takes no space — otherwise the
+// year sits 17px short of the dates below it and the gutter stops being a rail.
+.news-year__link::after {
+    content: "#";
+    position: absolute;
+    left: 100%;
+    top: 0;
+    padding-left: 0.3rem;
+    color: var(--text-faint);
+    opacity: 0;
+    transition: opacity 0.16s ease;
+}
+
+.news-year__head:hover .news-year__link::after {
+    opacity: 1;
+}
+
+.news-year__n {
+    padding-left: var(--news-indent);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+}
+
+// List & items -------------------------------------------------------------
 .news-timeline {
     list-style: none;
     padding: 0;
@@ -48,189 +208,425 @@ $news-dot-size: 10px;
 
 .news-timeline__item {
     display: grid;
-    grid-template-columns: $news-date-col 1fr;
-    column-gap: $news-gap;
+    grid-template-columns: var(--news-date-col) 1fr;
+    column-gap: var(--news-gap);
     position: relative;
-    padding-bottom: 1.85rem;
-    opacity: 1;
-    // `both`, not `forwards`: `forwards` only fills *after* the animation, so
-    // during the stagger delay the item rendered at opacity 1, then snapped to
-    // 0 when its turn came — visible, blink out, fade back in.
-    animation: news-item-in 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-}
-
-// Delays are capped so the list stays usable as it grows: past the cap every
-// remaining item shares the last delay instead of animating unstaggered.
-@for $i from 1 through 60 {
-    .news-timeline__item:nth-child(#{$i}) {
-        animation-delay: #{min(0.15 + ($i - 1) * 0.07, 1.2)}s;
-
-        &::before {
-            animation-delay: #{min(0.2 + ($i - 1) * 0.07, 1.25)}s;
-        }
-    }
-}
-
-.news-timeline__item:nth-child(n + 61) {
-    animation-delay: 1.2s;
-
-    &::before {
-        animation-delay: 1.25s;
-    }
+    padding-bottom: 1.7rem;
+    scroll-margin-top: 4.5rem;
 }
 
 .news-timeline__item:last-child {
-    padding-bottom: 0.35rem;
+    padding-bottom: 0.6rem;
 }
 
-@keyframes news-item-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+// Reveal on first entry, once. The hiding rule is namespaced under `.js-news`,
+// a class the motion script adds to <html> only after it has confirmed that
+// IntersectionObserver exists — so with JS off, or if the file 404s, every
+// entry is simply visible. Never `opacity: 0` unconditionally.
+.js-news .news-timeline__item {
+    opacity: 0;
+    transform: translateY(6px);
 }
 
-// Timeline dot — centered on the spine.
-.news-timeline__item::before {
+.js-news .news-timeline__item.is-seen {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.3s var(--news-ease), transform 0.3s var(--news-ease);
+}
+
+// Metadata rail ------------------------------------------------------------
+// Sticky, so a long entry keeps its date. `position: sticky` inside a grid
+// area is bounded by the row, so it can never escape its own entry — no JS,
+// and short entries never move at all.
+.news-timeline__meta {
+    position: sticky;
+    top: var(--news-stick);
+    align-self: start;
+    text-align: right;
+    padding-top: 0.3rem;
+    z-index: 2;
+}
+
+// The dot rides in the rail rather than on the item, so it stays welded to
+// the date while the rail is parked.
+.news-timeline__meta::after {
     content: "";
     position: absolute;
-    left: calc(#{$news-date-col} + #{$news-gap} - (#{$news-dot-size} / 2));
-    top: 0.5rem;
-    width: $news-dot-size;
-    height: $news-dot-size;
+    right: calc(-1 * (var(--news-gap) + var(--news-dot) / 2));
+    top: 0.62rem;
+    width: var(--news-dot);
+    height: var(--news-dot);
     border-radius: 50%;
-    background: $bg-color;
-    border: 1.5px solid $moon-gray;
+    background: var(--surface);
+    border: 1.5px solid var(--timeline-dot-border);
     box-sizing: border-box;
-    z-index: 1;
-    transform: scale(1);
-    animation: news-dot-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: background-color 0.22s ease, border-color 0.22s ease,
+                box-shadow 0.22s ease, transform 0.18s var(--news-ease);
 }
 
-@keyframes news-dot-pop {
-    0%   { transform: scale(0); }
-    70%  { transform: scale(1.15); }
-    100% { transform: scale(1); }
-}
-
-.news-timeline__item:hover::before {
-    background: $blue;
-    border-color: $blue;
-    box-shadow: 0 0 0 4px rgba(53, 126, 221, 0.12);
-}
-
-// Date gutter -------------------------------------------------------------
 .news-timeline__date {
+    display: block;
     font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: $silver;
-    line-height: 1.6;
-    text-align: right;
-    padding-top: 0.35rem;
+    color: var(--text-subtle);
+    line-height: 1.4;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    transition: color 0.25s ease;
+    transition: color 0.22s ease;
 }
 
-.news-timeline__item:hover .news-timeline__date {
-    color: $mid-gray;
+// Type. Scanning aid: at fifty entries you look down the gutter for AWARD.
+.news-timeline__kind {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-faint);
+    margin-top: 0.1rem;
+    white-space: nowrap;
 }
 
-// Content -----------------------------------------------------------------
+.news-timeline__item[data-kind="award"] .news-timeline__kind {
+    color: var(--award);
+}
+
+// The single accent in the list at rest: the newest entry.
+.news-timeline__item.is-newest .news-timeline__meta::after {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-halo);
+}
+
+.news-timeline__item.is-newest .news-timeline__date {
+    color: var(--text-muted);
+}
+
+.news-timeline__item[data-kind="award"] .news-timeline__meta::after {
+    border-color: var(--award);
+}
+
+.news-timeline__item:hover .news-timeline__meta::after,
+.news-timeline__item:focus-within .news-timeline__meta::after {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-halo);
+}
+
+.news-timeline__item:hover .news-timeline__date,
+.news-timeline__item:focus-within .news-timeline__date {
+    color: var(--text-muted);
+}
+
+// The dot you are pulling towards swells with the accumulated effort.
+.news-timeline__item.is-pull .news-timeline__meta::after {
+    border-color: var(--accent);
+    transform: scale(calc(1 + var(--news-tension, 0) * 0.5));
+}
+
+// Content ------------------------------------------------------------------
 .news-timeline__content {
-    padding-left: 1.75rem;
+    padding-left: var(--news-indent);
     min-width: 0;
-    color: $text-color;
+    color: var(--text);
+}
+
+.news-timeline__title {
+    font-size: 1rem;
+    line-height: 1.4;
+    font-weight: 600;
+    color: var(--text-strong);
+    margin: 0 0 0.15rem;
+    letter-spacing: -0.003em;
+}
+
+// No underline at rest. Fifty underlined headlines is fifty horizontal rules,
+// and a bold heading in its own block is not ambiguous the way an inline link
+// inside a paragraph is (WCAG F73 is about the latter). It underlines on hover
+// and on keyboard focus, and the dot lights at the same moment.
+.news-timeline__title a {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    transition: color 0.16s ease;
+}
+
+.news-timeline__title a:hover,
+.news-timeline__title a:focus-visible {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
 }
 
 .news-timeline__summary {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     line-height: 1.55;
+    color: var(--text-muted);
     margin: 0;
 }
 
 .news-timeline__summary > p:first-child { margin-top: 0; }
 .news-timeline__summary > p:last-child { margin-bottom: 0; }
-.news-timeline__summary strong { color: $title-color; }
+.news-timeline__summary strong { color: var(--text); font-weight: 600; }
 
-.news-timeline__summary img {
-    max-width: 100%;
-    height: auto;
+.news-timeline__media {
     display: block;
-    border-radius: 0.75rem;
-    margin: 0.85rem 0 0.25rem;
-    border: 1px solid $black-05;
+    margin: 0.7rem 0 0;
+    max-width: 22rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    line-height: 0;
 }
 
-// Pill links (harmonized with Fred's paper cover pub-misc look)
+.news-timeline__media img {
+    width: 100%;
+    height: auto;
+    filter: var(--media-filter);
+}
+
+// Attachments --------------------------------------------------------------
+// Same surface and ink as the nav pills and the paper covers, so the three
+// read as one system. Quieter than v1: no permanent fill, the pill only
+// materialises on hover, which stops fifty entries turning into confetti.
 .news-timeline__links {
-    margin-top: 0.65rem;
-    font-size: 0.75rem;
-    color: $gray;
-}
-
-.news-timeline__links .pub-misc {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.55rem;
+    font-size: 0.74rem;
 }
 
-.news-timeline__links .pub-misc a {
+.news-timeline__links a {
     display: inline-flex;
     align-items: center;
-    background-color: $near-white;
-    padding: 0.22rem 0.65rem;
+    gap: 0.32rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 1rem;
-    color: $text-color;
     line-height: 1.4;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    color: var(--text-subtle);
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--border);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.news-timeline__links .pub-misc a:hover {
-    background-color: $blue;
-    color: $white !important;
+.news-timeline__links a:hover {
+    background-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+    color: var(--accent-contrast);
     text-decoration: none;
 }
 
-.news-timeline__links .pub-misc a i {
-    margin-right: 0.3rem;
-    font-size: 0.7rem;
+.news-timeline__links a i,
+.news-timeline__links a svg {
+    font-size: 0.68rem;
+    opacity: 0.8;
 }
 
-// Homepage variant: slightly tighter, clamp summary
+// Homepage variant ---------------------------------------------------------
 .news-timeline-wrapper--home .news-timeline__item {
-    padding-bottom: 1.35rem;
+    padding-bottom: 1.4rem;
 }
 
-.news-timeline-wrapper--home .news-timeline__summary {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+// The preview is a teaser, and one entry with a photo is three times the height
+// of the other two — it unbalances the block and pushes the publications section
+// off the fold. Images stay on /news/. Delete this rule to let them through.
+.news-timeline-wrapper--home .news-timeline__media {
+    display: none;
 }
 
-// Floating jump button ----------------------------------------------------
+// Three entries have no "how far down the record am I" to answer.
+.news-timeline-wrapper--home .news-spine__prog {
+    display: none;
+}
+
+// Nothing to stick to on the homepage — three entries never travel. It stays
+// `relative` and not `static`, though: the dot is an ::after on this box, so a
+// static meta would hand it to the wrapper as its containing block and fling it
+// to the far right of the page. That was a real bug, found on the built site.
+.news-timeline-wrapper--home .news-timeline__meta {
+    position: relative;
+    top: auto;
+}
+
+.news-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-subtle);
+    text-decoration: none;
+}
+
+.news-more:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.news-more span {
+    transition: transform 0.18s var(--news-ease);
+}
+
+.news-more:hover span {
+    transform: translateX(3px);
+}
+
+// Snap mode ----------------------------------------------------------------
+// Two declarations and the platform gives you one-item-per-gesture with no
+// JavaScript in the event path at all. `proximity` rather than `mandatory`:
+// mandatory on the document scroller means the page must always come to rest
+// on a snap target, which drags you back out of the footer.
+//
+// `.news-snap-edge` are zero-height sentinels emitted above and below the
+// list, so that if you *do* switch to mandatory there are legal resting places
+// outside the timeline. They cost nothing when snapping is off.
+.news-snap-edge {
+    scroll-snap-align: start;
+    height: 0;
+}
+
+html.news-snap {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: 4.5rem;
+}
+
+html.news-snap-mandatory {
+    scroll-snap-type: y mandatory;
+}
+
+html.news-snap .news-timeline__item,
+html.news-snap-mandatory .news-timeline__item {
+    scroll-snap-align: start;
+    // The whole point: a fling cannot skate past an entry.
+    scroll-snap-stop: always;
+}
+
+// An entry taller than most of the viewport can trap a mandatory scroller, so
+// the script marks those and they opt out.
+html.news-snap .news-timeline__item.is-tall,
+html.news-snap-mandatory .news-timeline__item.is-tall {
+    scroll-snap-align: none;
+}
+
+// Reduced motion -----------------------------------------------------------
+// A reduced-motion visitor asked for less motion, not for a slower version of
+// the same motion: the friction, the snapping and the reveal all switch off.
+@media (prefers-reduced-motion: reduce) {
+    .js-news .news-timeline__item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .news-timeline-wrapper,
+    .news-timeline__meta::after,
+    .news-timeline__links a,
+    .news-timeline__title a {
+        transition: none;
+    }
+
+    html.news-snap,
+    html.news-snap-mandatory {
+        scroll-snap-type: none;
+    }
+}
+
+// Mobile -------------------------------------------------------------------
+// One dimension at 320 CSS px (WCAG 1.4.10). The metadata rail unwraps into a
+// single line above the headline — date and kind side by side rather than
+// stacked, because vertical space is the scarce axis here.
+@media screen and (max-width: $mobile) {
+    .news {
+        --news-date-col: 0;
+        --news-gap: 0;
+        --news-indent: 0;
+    }
+
+    .news-spine {
+        left: 4px;
+    }
+
+    .news-years {
+        padding-left: 1.5rem;
+    }
+
+    .news-timeline__item,
+    .news-year__head {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+        row-gap: 0.3rem;
+        padding-left: 1.5rem;
+    }
+
+    .news-year__head {
+        padding-top: 1rem;
+        padding-bottom: 0.4rem;
+    }
+
+    // `relative`, never `static` — see the note on the homepage variant.
+    .news-timeline__meta {
+        position: relative;
+        top: auto;
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        text-align: left;
+        padding-top: 0;
+    }
+
+    // The rail's left edge sits at the item's 1.5rem padding; the spine is at
+    // 4px from the wrapper. Put the dot's centre on the spine from there.
+    .news-timeline__meta::after {
+        right: auto;
+        left: calc(-1.5rem + 4px - var(--news-dot) / 2);
+        top: 0.28rem;
+    }
+
+    .news-timeline__kind {
+        margin-top: 0;
+    }
+
+    .news-year__link,
+    .news-year__n {
+        text-align: left;
+        padding-left: 0;
+    }
+
+    .news-timeline__title {
+        font-size: 0.98rem;
+    }
+
+    .news-more {
+        padding-left: 1.5rem;
+    }
+}
+
+// Floating jump button -----------------------------------------------------
 .news-jump {
     position: fixed;
     right: 1.75rem;
     bottom: 1.75rem;
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    border: 1px solid $border-color;
-    background: $bg-color;
-    color: $mid-gray;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-1);
     opacity: 0;
     transform: translateY(12px) scale(0.9);
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transition: opacity 0.3s ease, transform 0.3s var(--news-ease),
                 background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     z-index: 50;
 }
@@ -242,13 +638,13 @@ $news-dot-size: 10px;
 }
 
 .news-jump:hover {
-    background: $blue;
-    color: $white;
-    border-color: $blue;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
 }
 
 .news-jump__arrow {
-    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition: transform 0.35s var(--news-ease);
     transform-origin: 10px 10px;
 }
 
@@ -256,40 +652,158 @@ $news-dot-size: 10px;
     transform: rotate(180deg);
 }
 
-// Respect reduced motion --------------------------------------------------
 @media (prefers-reduced-motion: reduce) {
-    // The animation lives on .news-timeline-spine; the __line child it used to
-    // target has no stroke and draws nothing, so this rule did nothing at all.
-    .news-timeline-spine { animation: none; transform: none; }
-    .news-timeline__item { animation: none; opacity: 1; transform: none; }
-    .news-timeline__item::before { animation: none; transform: scale(1); }
+    .news-jump,
+    .news-jump__arrow {
+        transition: none;
+    }
 }
 
-// Mobile ------------------------------------------------------------------
+// Latest News carousel (homepage only) --------------------------------------
+// A fixed window onto the most recent entries that you wind through in place.
+// Every rule here is gated on `.is-live`, which the script adds only once it
+// has decided the carousel should run — so with JS off, on touch, or under
+// reduced motion this is an ordinary list and nothing is clipped or hidden.
+.news-carousel.is-live {
+    position: relative;
+    overflow: hidden;
+    // The entry leaving and the one arriving dissolve at the edges instead of
+    // being cut, so the window reads as a window rather than as a broken box.
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 88%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 88%, transparent 100%);
+}
+
+// At the ends there is nothing to dissolve into, so the mask is released and
+// the first and last entries sit flush.
+.news-carousel.is-live[data-at-start="true"] {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 88%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 0, #000 88%, transparent 100%);
+}
+
+.news-carousel.is-live[data-at-end="true"] {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 100%);
+}
+
+.news-carousel.is-live[data-at-start="true"][data-at-end="true"] {
+    -webkit-mask-image: none;
+            mask-image: none;
+}
+
+.news-carousel.is-live .news-timeline {
+    will-change: transform;
+}
+
+// Off-window entries stay in the DOM — findable with ⌘F, present for a screen
+// reader — but are dimmed and taken out of the tab order by the script.
+.news-carousel.is-live .news-timeline__item.is-offstage {
+    opacity: 0.32;
+}
+
+.news-carousel.is-live:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 6px;
+}
+
+// The spine is drawn by the wrapper inside the clip, so it travels with the
+// entries rather than standing still behind them.
+.news-carousel.is-live .news-spine__prog,
+.news-carousel.is-live .news-spine__pull {
+    display: none;
+}
+
+// Without the carousel — no JS, touch, reduced motion — the homepage shows
+// only the window's worth of entries. The extra ones are rendered for the
+// carousel to wind through, not to be dumped on the page: switching the
+// carousel off used to reveal the entire archive on the homepage.
+// The `4` is `window` + 1; they are set together in index.md.
+.news--home .news-timeline__item:nth-child(n + 4) { display: none; }
+.news-carousel.is-live .news-timeline__item:nth-child(n + 4) { display: grid; }
+
+// Touch pager -------------------------------------------------------------
+// Only ever shown on a coarse pointer, where the wheel mechanic does not apply.
+// One control row under the list: paging on the left, the way out on the
+// right. They are the same kind of thing — ways of getting to more entries —
+// so they belong on one line rather than stacked as two separate blocks.
+.news-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+    padding-left: calc(var(--news-date-col) + var(--news-gap) + var(--news-indent));
+}
+
+.news-pager {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.news-pager[hidden] { display: none; }
+
+.news-pager__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    // 44px: the smallest target that is comfortable on a touchscreen.
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-raised);
+    color: var(--text);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.news-pager__btn:hover { background: var(--surface-raised-hover); }
+
+.news-pager__btn:disabled {
+    color: var(--text-faint);
+    cursor: default;
+    opacity: 0.55;
+}
+
+.news-pager__pos {
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-subtle);
+}
+
 @media screen and (max-width: $mobile) {
-    .news-timeline-spine {
-        left: 4px;
-    }
+    .news-foot { padding-left: 0; }
+    // 44px is the comfortable touch target; the pager only ever appears on
+    // touch, so it grows there rather than shrinking everywhere else.
+    .news-pager__btn { width: 44px; height: 44px; }
+}
 
-    .news-timeline__item {
-        grid-template-columns: 1fr;
-        column-gap: 0;
-        row-gap: 0.35rem;
-        padding-left: 1.5rem;
-        padding-bottom: 1.6rem;
+// "All news" lives on the right, whether the pager is there or not.
+.news-foot .news-more { margin-left: auto; }
 
-        &::before {
-            left: calc(4px - (#{$news-dot-size} / 2) + 1px);
-            top: 0.3rem;
-        }
-    }
-
-    .news-timeline__date {
-        text-align: left;
-        padding-top: 0;
-    }
-
-    .news-timeline__content {
-        padding-left: 0;
+// On touch the window is paged with buttons, a screenful at a time — the
+// bottom dissolve only made the third entry look broken. Hard edge there.
+@media (hover: none), (pointer: coarse) {
+    .news-carousel.is-live,
+    .news-carousel.is-live[data-at-start="true"],
+    .news-carousel.is-live[data-at-end="true"] {
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 }
+
+// The foot row spans the wide l-page column, but its right edge should sit on
+// the TEXT column's right edge: page-end minus the gutter and middle tracks —
+// two column widths (3.5rem) plus two grid gaps (1.5rem) = 10rem.
+@media screen and (min-width: 1101px) {
+    .news-foot { padding-right: 10rem; }
+}
+
+// The wrapper's top margin was INSIDE the clipped window, shifting the whole
+// slice 22px down while the height maths assumed it started at the top edge —
+// the last entry's truncation, found by measurement. The breathing room moves
+// to the frame itself; inside the glass, geometry starts at zero.
+.news-carousel.is-live { margin: 1.35rem 0 0.25rem; }
+.news-carousel.is-live .news-timeline-wrapper--home { margin: 0; }

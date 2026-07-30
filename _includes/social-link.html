@@ -1,3 +1,3 @@
-<a class="social-link" href="{{ link.url }}" aria-label="{{ link.id | capitalize }}: {{ link.description }}">
-    <i class="{{ link.class }}" style="color: {{ link.color }}" aria-hidden="true"></i>
+<a class="social-link" href="{{ link.url }}" aria-label="{{ link.id | capitalize }}: {{ link.description }}" style="--brand: {{ link.color }}; --brand-dark: {{ link.color-dark | default: link.color }}">
+    <i class="{{ link.class }}" aria-hidden="true"></i>
 </a>

@@ -180,18 +180,22 @@
 	align-items: center;
 }
 
-.pub-misc a {
-	color: $gray !important;
+// Scoped to #cv. This used to be a bare `.pub-misc a` with `color: … !important`,
+// which leaked out of the CV and beat the more specific news-timeline rule —
+// that is why the Project/PDF chips rendered grey on the news page.
+// Styled to match the nav pills: same surface, same ink.
+#cv .pub-misc a {
+	color: var(--text);
 	white-space: nowrap;
-	background-color: $near-white;
+	background-color: var(--surface-raised);
 	padding: 0.15rem 0.4rem 0.15rem 0.4rem !important;
 	border-radius: 1rem;
 }
 
-.pub-misc a:hover {
-	color: $white !important;
+#cv .pub-misc a:hover {
+	color: var(--accent-contrast);
 	text-decoration: none;
-	background-color: $blue;
+	background-color: var(--accent);
 }
 
 .equal-contribution {

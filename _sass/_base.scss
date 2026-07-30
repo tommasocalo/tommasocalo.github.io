@@ -45,10 +45,11 @@ main {
 }
 
 // Visible keyboard focus. Pointer users never see it; keyboard users need it.
+// No border-radius here: the outline already follows the element's own radius,
+// and setting one squares off anything round (the theme toggle, avatars).
 :focus-visible {
-  outline: 2px solid $blue;
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
 img {

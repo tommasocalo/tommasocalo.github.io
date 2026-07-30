@@ -1,0 +1,43 @@
+// Ambient background canvas. See assets/js/bg-isobars.js for what it draws.
+//
+// z-index 0 rather than -1: the site paints its page colour on `body` (which
+// also carries the overscroll fix), and a canvas at -1 would be buried under
+// it. Sitting at 0 inside body puts it above body's background and below the
+// content, which is promoted to z-index 1.
+#bg {
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+	pointer-events: none;
+	// Fades in once, so the first paint is never a flash of lines.
+	opacity: 0;
+	animation: bg-in 1.2s ease 0.15s forwards;
+}
+
+@keyframes bg-in {
+	to { opacity: 1; }
+}
+
+header, main, footer { position: relative; z-index: 1; }
+
+// The column quieting is NO LONGER a CSS mask. A mask is applied at
+// composite time in fixed screen space: the fluid pass displaced the canvas
+// pixels underneath a frozen alpha ramp, which is exactly the "static sheet
+// above the animation" that kept being reported — a real artefact, not a
+// perception. The renderer now paints the attenuation INTO the canvas
+// (destination-out gradient), so the snapshot the fluid samples already
+// carries it, and everything moves as one layer.
+
+// Only genuinely narrow viewports have no margin to put art in. This used to
+// cut at 1100px, which hid the background on any window that was not
+// maximised — and every screenshot I checked was 1440 wide, so I never saw it.
+// The script also refuses to run without a fine pointer.
+@media screen and (max-width: 820px) {
+	#bg { display: none; }
+}
+
+@media print {
+	#bg { display: none; }
+}

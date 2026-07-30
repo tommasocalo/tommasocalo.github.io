@@ -26,16 +26,16 @@ $cover-width: 8.5px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: $black-025;
-  border-radius: 1.5rem;
-  transition: all .2s ease-in-out;
+  // The card speaks the background's language: the sketch mockups resolve
+  // into crisp 1px-outlined frames, and these are the resolved artboards
+  // sitting on the same wall. Opaque surface (it occludes the sketch behind,
+  // which is what makes the text readable), ink border, drawing-radius.
+  // Surface and border now come from the liquid-glass recipe in _glass.scss.
+  border-radius: 16px;
 }
 
 .cover:hover {
-  // border: 1px solid $dark-gray;
   text-decoration: none;
-  background-color: $black-05;
-  transform: scale(1.03)
 }
 
 .cover-inner {
@@ -48,7 +48,6 @@ $cover-width: 8.5px;
 
 .cover-title {
   font-size: 1.4rem;
-  text-transform: capitalize;
   font-weight: 600;
   color: $title-color;
   line-height: 1.3;
@@ -109,10 +108,10 @@ $cover-width: 8.5px;
 }
 
 .cover-image > a > img {
-  border-radius: 1rem;
-  border: 1px solid $black-05;
-  // padding: 0.25rem;
-  background-color: white;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  // A mat, not a surface: paper figures need light behind them in both themes.
+  background-color: var(--surface-media);
 }
 
 .cover-link {
@@ -127,15 +126,18 @@ $cover-width: 8.5px;
 }
 
 .cover-links > .pub-misc > a {
-  background-color: #ffffff;
+  // Same chip surface as the news timeline and the CV, so every chip on the
+  // site is one system — and it stays visible now the card is plain surface.
+  background-color: var(--surface-raised);
+  color: var(--text);
 	padding: 0.25rem 0.55rem 0.25rem 0.55rem !important;
 	border-radius: 1rem;
   margin-right: 0rem;
 }
 
 .cover-links > .pub-misc > a:hover {
-  color: #ffffff !important;
-  background-color: $blue;
+  color: var(--accent-contrast);
+  background-color: var(--accent);
 }
 
 @media screen and (max-width: $homepage-pre-mobile) {

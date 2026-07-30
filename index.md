@@ -45,7 +45,7 @@ title: Home
 <p class="feature-text">
    Recent updates, achievements, and announcements.
 </p>
-{% include news-list.html limit=3 variant="home" %}
+{% include news-list.html limit=12 variant="home" window=3 %}
 <hr class="l-middle home-hr">
 <h2 class="feature-title">Featured <a href="/cv/#publications">Research Publications</a></h2>
 <p class="feature-text">

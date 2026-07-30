@@ -215,3 +215,16 @@ $cv-icon-aspect-ratio: 1.33;
 
 }
 
+
+// Institution logos in dark mode.
+// polito.svg is a single dark path on transparent (invisible), itu.png is an
+// opaque black field (a hole punched in the paragraph) and gatech.svg loses its
+// navy shield leaving the gold letters floating. They get a mat — and a mat is
+// not a surface, it stays light in both themes. Deliberately NOT filter:
+// invert(): these are trademarks and, elsewhere, scientific figures.
+:root[data-theme="dark"] .intro-logo {
+	background: var(--surface-media);
+	border-radius: 3px;
+	padding: 1px;
+	box-sizing: content-box;
+}

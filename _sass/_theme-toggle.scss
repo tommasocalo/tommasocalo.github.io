@@ -1,0 +1,85 @@
+// Floating, because the homepage and the CV deliberately have no header to put
+// it in. Small enough to ignore, always in the same place on every page.
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  // No outline: the filled disc is the button. A ring around it only competes
+  // with the icon at this size.
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--text-subtle);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+// Hover is the fill getting stronger, nothing more.
+.theme-toggle:hover {
+  background: var(--surface-raised-hover);
+  color: var(--text);
+}
+
+.theme-toggle__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// The icon shows what you'll get, not what you're in: a moon while the page is
+// light reads as an action rather than a status readout.
+.theme-toggle svg { display: none; }
+.theme-toggle[data-theme="light"] .theme-toggle__dark,
+.theme-toggle[data-theme="dark"]  .theme-toggle__light { display: block; }
+
+// No JS, no preference to express: the control would be a dead button.
+html:not([data-theme]) .theme-toggle { display: none; }
+
+@media print {
+  .theme-toggle { display: none; }
+}
+
+// Deliberately NOT moved to the bottom on narrow screens: a control that
+// changes corner when the window is resized reads as a bug, not as a layout.
+@media screen and (max-width: $mobile) {
+  .theme-toggle {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Social icons. The colour used to be an inline style="color:" straight from the
+// data file, which no token could override — the greys scored 2.09 on the dark
+// page. Now the data supplies --brand / --brand-dark and the stylesheet decides.
+.social-link i,
+.cv-social-link i {
+	color: var(--brand);
+}
+
+:root[data-theme="dark"] .social-link i,
+:root[data-theme="dark"] .cv-social-link i {
+	color: var(--brand-dark, var(--text));
+}
