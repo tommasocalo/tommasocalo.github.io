@@ -60,5 +60,11 @@
   window.addEventListener('storage', function (e) { if (e.key === 'theme') paint(current(), false); });
 
   paint(current(), false);
+
+  // Restored from the back-forward cache, iOS keeps the tapped element
+  // focused (and visually pressed). Let it go.
+  window.addEventListener('pageshow', function () {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  });
 })();
 </script>

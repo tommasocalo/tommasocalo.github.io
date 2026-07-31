@@ -760,22 +760,25 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
     transition: color 0.15s ease;
 }
 
-// The press lives on the SVG, not the button: iOS Safari has a long-standing
-// repaint bug where an SVG inside an element transformed on :active is not
-// redrawn after the tap — the arrow literally vanished. translateZ(0) forces
-// it onto its own layer, which sidesteps the bug entirely.
-.news-pager__btn svg {
-    transform: translateZ(0);
+// Chevrons drawn in CSS. The inline SVGs kept vanishing on iOS (a repaint
+// bug that survived translateZ layering); two borders and a rotation are
+// painted by the same code path as everything else and cannot fail.
+.news-pager__chev {
+    display: block;
+    width: 11px;
+    height: 11px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    border-radius: 1px;
     transition: transform 0.12s ease;
 }
 
-.news-pager__btn:active {
-    color: var(--accent);
-}
+.news-pager__chev--down { transform: rotate(45deg) translate(-2px, -2px); }
+.news-pager__chev--up   { transform: rotate(-135deg) translate(-2px, -2px); }
 
-.news-pager__btn:active svg {
-    transform: translateZ(0) scale(0.82);
-}
+.news-pager__btn:active { color: var(--accent); }
+.news-pager__btn:active .news-pager__chev--down { transform: rotate(45deg) translate(-2px, -2px) scale(0.85); }
+.news-pager__btn:active .news-pager__chev--up   { transform: rotate(-135deg) translate(-2px, -2px) scale(0.85); }
 
 // Disabled must read as "nothing further", never as "the arrow vanished":
 // same glyph, quieter ink, full presence.

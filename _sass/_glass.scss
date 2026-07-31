@@ -307,3 +307,32 @@
 		transition: none;
 	}
 }
+
+// --- STICKY HOVER, neutralised on touch -----------------------------------
+// iOS keeps an element's :hover styles applied after a tap (and across a
+// bfcache back-navigation) until you touch something else. On a device with
+// no hover, those styles should simply never fire: re-assert the resting
+// look under (hover: none), so nothing lingers "highlighted" after a tap or
+// a back-swipe.
+@media (hover: none) {
+	#masthead nav > a:hover,
+	#everything-else > a:hover,
+	.social-link:hover,
+	.theme-toggle:hover,
+	.cover:hover {
+		background-color: var(--glass-tint);
+		transform: none;
+	}
+
+	#cv .pub-misc a:hover,
+	.news-timeline__links .pub-misc a:hover,
+	.cover-links > .pub-misc > a:hover {
+		background-color: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+		border-color: var(--border);
+		color: var(--text) !important;
+	}
+
+	#paper-materials a:hover { background-color: var(--glass-tint); }
+	.news-more:hover, .news-years__chip:hover { color: var(--text-subtle); }
+	.news-timeline__title a:hover { color: inherit; }
+}
