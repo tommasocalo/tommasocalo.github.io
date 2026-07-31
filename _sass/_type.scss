@@ -57,7 +57,10 @@ a {
 
 }
 
-a:hover, a:focus {
+// :focus-visible, not :focus: on iOS a tap focuses the link and the style
+// sticks after navigating back — links stayed dark and underlined as if held.
+// Keyboard users keep the full treatment.
+a:hover, a:focus-visible {
   color: $dark-blue;
   text-decoration: underline;
   text-decoration-color: $light-silver;
