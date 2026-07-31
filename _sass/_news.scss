@@ -293,16 +293,11 @@
     color: var(--award);
 }
 
-// The single accent in the list at rest: the newest entry.
-.news-timeline__item.is-newest .news-timeline__meta::after {
-    background: var(--accent);
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-halo);
-}
-
-.news-timeline__item.is-newest .news-timeline__date {
-    color: var(--text-muted);
-}
+// No resting accent on the newest dot. It came from the redesign study
+// ("what is new should be answerable at rest"), but in practice it read as a
+// hover that never let go — and on touch, where hover does not exist, a
+// single blue dot was pure noise. Every dot is hollow until interacted with;
+// recency is already carried by the order and the dates.
 
 .news-timeline__item[data-kind="award"] .news-timeline__meta::after {
     border-color: var(--award);
