@@ -728,8 +728,9 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
 .news-foot {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    // One right-aligned breath: position, the two steppers, the way out.
+    justify-content: flex-end;
+    gap: 0.35rem;
     margin-top: 0.9rem;
     padding-left: calc(var(--news-date-col) + var(--news-gap) + var(--news-indent));
 }
@@ -746,25 +747,26 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    // 44px: the smallest target that is comfortable on a touchscreen.
-    width: 38px;
-    height: 38px;
+    // Typography, not chrome: the pager wears the same clothes as "All news"
+    // beside it — quiet ink, no disc, no border. The hit area stays 44px.
+    width: 44px;
+    height: 44px;
     padding: 0;
     border: 0;
-    border-radius: 50%;
-    background: var(--surface-raised);
-    color: var(--text);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-subtle);
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
 }
 
-.news-pager__btn:hover { background: var(--surface-raised-hover); }
+.news-pager__btn:active { color: var(--accent); }
 
 .news-pager__btn:disabled {
     color: var(--text-faint);
     cursor: default;
-    opacity: 0.55;
+    opacity: 0.45;
 }
 
 .news-pager__pos {
@@ -780,8 +782,8 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
     .news-pager__btn { width: 44px; height: 44px; }
 }
 
-// "All news" lives on the right, whether the pager is there or not.
-.news-foot .news-more { margin-left: auto; }
+// "All news" closes the row; a hairline dot separates it from the pager.
+.news-foot .news-more { margin-left: 0.65rem; }
 
 // On touch the window is paged with buttons, a screenful at a time — the
 // bottom dissolve only made the third entry look broken. Hard edge there.

@@ -131,10 +131,12 @@
 	transition: background-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 
-// Hover: the lens engages in the canvas beneath and the panel dilates a
-// touch, same body language as the pills. No shadow bloom, no tint change.
+// Hover: the lens engages in the canvas beneath, the panel dilates a touch,
+// and the tint deepens one translucent step — the same faint thickening of
+// the glass the pills have. No shadow bloom.
 .cover:hover {
 	transform: translateY(-1px) scale(1.02);
+	background-color: var(--glass-tint-strong);
 }
 
 
@@ -204,4 +206,53 @@
 .theme-toggle:hover,
 .news-pager__btn:hover {
 	background-color: var(--glass-tint-strong);
+}
+
+// The touch pager dresses like the "All news" link beside it — typography,
+// not glass chrome. Later in the cascade, so it undresses the material.
+.news-pager__btn,
+.news-pager__btn:hover {
+	background: transparent;
+	border: 0;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+// --- paper pages join the material ---------------------------------------
+// The hero frame is a pane like the cards; the material links are the same
+// pills as the nav; BibTeX sits on a quiet glass slab instead of hard white.
+#paper-title-wrapper {
+	background-color: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+	border: 1px solid var(--glass-edge);
+	border-radius: 16px;
+	-webkit-backdrop-filter: blur(8px) saturate(1.4);
+	backdrop-filter: blur(8px) saturate(1.4);
+	box-shadow:
+		inset 0 1px 0 var(--glass-hi),
+		inset 0 -1px 1px var(--glass-lo),
+		var(--glass-drop);
+}
+
+#paper-materials a {
+	background-color: var(--glass-tint);
+	border: 1px solid var(--glass-edge);
+	border-radius: 999px;
+	box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 0 var(--glass-lo);
+}
+
+#paper-materials a:hover {
+	background-color: var(--glass-tint-strong);
+	text-decoration: none;
+}
+
+.highlighter-rouge.bibtex {
+	background-color: color-mix(in srgb, var(--surface-raised) 72%, transparent);
+	border: 1px solid var(--glass-edge);
+	border-radius: 12px;
+	box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 1px var(--glass-lo);
+}
+
+.highlighter-rouge.bibtex .highlight {
+	background: transparent;
 }

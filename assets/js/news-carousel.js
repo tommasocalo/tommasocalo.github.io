@@ -203,7 +203,7 @@
   var CAPTURE_X = 0.72;
 
   function onWheel(e) {
-    if (reduced.matches || coarse.matches) return;
+    if (reduced.matches || coarseNow()) return;
     if (e.ctrlKey) return;                       // pinch-zoom is not ours
     var fr = frame.getBoundingClientRect();
     if ((e.clientX - fr.left) / fr.width > CAPTURE_X) return;
@@ -323,11 +323,32 @@
     });
   }
 
+  /* The media query lies after DevTools' device toolbar closes: Chromium
+     keeps reporting a coarse pointer until the page reloads, so the mobile
+     pager survived a desktop→mobile→desktop resize. Actual input events are
+     evidence the query cannot fake: a real mouse move (with no recent touch)
+     proves a fine pointer, a touchstart proves the opposite, and the freshest
+     evidence outranks the query. */
+  var inputMode = null, lastTouchT = 0;
+  window.addEventListener('touchstart', function () {
+    lastTouchT = Date.now();
+    if (inputMode !== 'coarse') { inputMode = 'coarse'; sync(); }
+  }, { passive: true });
+  window.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'mouse' && Date.now() - lastTouchT > 800 && inputMode !== 'fine') {
+      inputMode = 'fine'; sync();
+    }
+  }, { passive: true });
+
+  function coarseNow() {
+    return inputMode ? inputMode === 'coarse' : coarse.matches;
+  }
+
   function sync() {
     // Reduced motion: no carousel at all, just the most recent entries.
     // Coarse pointer: the window stays, paged with buttons instead of the wheel.
     if (reduced.matches) disable();
-    else enable(coarse.matches);
+    else enable(coarseNow());
   }
 
   // Re-run the whole decision on resize, not just re-measure. Dragging a window

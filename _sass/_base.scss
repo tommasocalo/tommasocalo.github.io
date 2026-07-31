@@ -42,7 +42,16 @@ body {
 
 main {
   flex: 1 0 auto;
+  // The footer fix stretches main to fill the viewport; without this, grid
+  // auto-rows stretch along with it and a short page (a news post: title,
+  // date, body) gets torn into distant bands.
+  align-content: start;
 }
+
+// iOS and Android flash a translucent veil on tap; every interactive element
+// here provides its own feedback, so the UA's blue square only reads as a
+// glitch. Keyboard focus stays fully visible below.
+a, button { -webkit-tap-highlight-color: transparent; }
 
 // Visible keyboard focus. Pointer users never see it; keyboard users need it.
 // No border-radius here: the outline already follows the element's own radius,
