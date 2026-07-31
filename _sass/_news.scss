@@ -761,12 +761,22 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
     appearance: none;
 }
 
-.news-pager__btn:active { color: var(--accent); }
+.news-pager__btn {
+    transition: color 0.15s ease, transform 0.1s ease;
+}
 
+.news-pager__btn:active {
+    color: var(--accent);
+    transform: scale(0.88);
+}
+
+// Disabled must read as "nothing further", never as "the arrow vanished":
+// same glyph, quieter ink, full presence.
 .news-pager__btn:disabled {
     color: var(--text-faint);
     cursor: default;
-    opacity: 0.45;
+    opacity: 0.85;
+    transform: none;
 }
 
 .news-pager__pos {
