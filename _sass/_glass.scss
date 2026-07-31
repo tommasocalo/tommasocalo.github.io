@@ -256,3 +256,54 @@
 .highlighter-rouge.bibtex .highlight {
 	background: transparent;
 }
+
+// --- THE PRESS (touch only) -----------------------------------------------
+// On a phone there is no hover to carry feedback, and a bare darkening reads
+// as "hard". Pressing puts GLASS under the finger: an iridescent wash from
+// the accent into violet, the specular rims, and a slight give. Instant on
+// press (no transition in), soft on release (the base transition eases back).
+@media (hover: none) {
+	#masthead nav > a,
+	#everything-else > a,
+	.social-link,
+	.news-more,
+	.news-years__chip,
+	.news-timeline__title a,
+	#cv .pub-misc a,
+	.news-timeline__links .pub-misc a,
+	.cover-links > .pub-misc > a,
+	#paper-materials a {
+		transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+	}
+
+	#masthead nav > a:active,
+	#everything-else > a:active,
+	.social-link:active,
+	.news-more:active,
+	.news-years__chip:active,
+	#cv .pub-misc a:active,
+	.news-timeline__links .pub-misc a:active,
+	.cover-links > .pub-misc > a:active,
+	#paper-materials a:active {
+		background-image: linear-gradient(120deg, var(--press-a), var(--press-b));
+		box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 -1px 1px var(--glass-lo);
+		transform: scale(0.97);
+		transition: none;
+		text-decoration: none;
+	}
+
+	// Headlines are text, not pills: the wash hugs the line instead.
+	.news-timeline__title a:active {
+		background-image: linear-gradient(120deg, var(--press-a), var(--press-b));
+		border-radius: 6px;
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--press-a) 60%, transparent);
+		transition: none;
+		text-decoration: none;
+	}
+
+	.cover:active {
+		background-image: linear-gradient(140deg, var(--press-a), transparent 55%, var(--press-b));
+		transform: scale(0.99);
+		transition: none;
+	}
+}

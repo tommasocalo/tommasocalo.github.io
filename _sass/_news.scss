@@ -762,12 +762,24 @@ html.news-snap-mandatory .news-timeline__item.is-tall {
 }
 
 .news-pager__btn {
-    transition: color 0.15s ease, transform 0.1s ease;
+    transition: color 0.15s ease;
+}
+
+// The press lives on the SVG, not the button: iOS Safari has a long-standing
+// repaint bug where an SVG inside an element transformed on :active is not
+// redrawn after the tap — the arrow literally vanished. translateZ(0) forces
+// it onto its own layer, which sidesteps the bug entirely.
+.news-pager__btn svg {
+    transform: translateZ(0);
+    transition: transform 0.12s ease;
 }
 
 .news-pager__btn:active {
     color: var(--accent);
-    transform: scale(0.88);
+}
+
+.news-pager__btn:active svg {
+    transform: translateZ(0) scale(0.82);
 }
 
 // Disabled must read as "nothing further", never as "the arrow vanished":

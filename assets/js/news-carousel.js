@@ -139,10 +139,7 @@
 
   function paintPager() {
     if (!pager || pager.hidden) return;
-    // Walking away from the frame forgives the boundary count.
-  frame.addEventListener('pointerleave', function () { endHolds = 0; });
-
-  pagerBtns.forEach(function (b) {
+    pagerBtns.forEach(function (b) {
       var dir = parseInt(b.getAttribute('data-dir'), 10);
       b.disabled = dir > 0 ? index >= maxIndex() : index <= 0;
     });
@@ -160,6 +157,9 @@
       // A screenful at a time: on touch you are paging, not winding.
       step(parseInt(b.getAttribute('data-dir'), 10) * WINDOW);
       paintPager();
+      // iOS keeps :focus (and with it, sticky styling) on the button after a
+      // tap; releasing it keeps the arrow in its resting look.
+      b.blur();
     });
   });
 

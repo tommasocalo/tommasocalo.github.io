@@ -39,6 +39,8 @@
   --glass-edge: rgba(22,26,34,.12);
   --glass-drop: 0 1px 2px rgba(20,24,30,.07), 0 10px 24px -14px rgba(20,24,30,.35);
   --glass-sheen: rgba(255,255,255,.34);
+  // Touch pressed-state wash: accent into violet, glass under the finger.
+  --press-a: rgba(37,105,201,.16);       --press-b: rgba(124,92,255,.18);
 
   // Generative background: two grid inks and a faint tint inside the lens.
   --art-minor: rgba(20,24,30,.17);  --art-major: rgba(20,24,30,.32);
@@ -80,6 +82,7 @@
   --glass-edge: rgba(255,255,255,.14);
   --glass-drop: 0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.65);
   --glass-sheen: rgba(255,255,255,.15);
+  --press-a: rgba(127,179,242,.22);      --press-b: rgba(167,139,250,.22);
 
   --art-minor: rgba(210,225,245,.14); --art-major: rgba(210,225,245,.26);
   --art-wash:  rgba(127,179,242,.055);
