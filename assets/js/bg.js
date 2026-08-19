@@ -403,14 +403,29 @@ var ART = (document.getElementById('bg') || {}).dataset
    * a high-water mark that then evaporates.
    * ====================================================================== */
   var FLOW_CELL = 24;                 /* px per field cell                   */
-  var FLOW_DECAY = 0.905;             /* ~0.23s half-life: a short wake */
-  var FLOW_RADIUS = 44;               /* brush radius, px — tight             */
+  var FLOW_DECAY = 0.938;             /* ~0.36s half-life: a thick wake       */
+  var FLOW_RADIUS = 72;               /* brush radius, px                     */
   var FLOW_PRESENCE = 0.42;           /* just being there                    */
-  var FLOW_VELBONUS = 1.5;            /* moving fast paints more             */
-  var DISTORT = 17;                   /* px of drag at full influence        */
-  var SWIRL = 0.42;                   /* radians of twist at full influence  */
-  var MAGNIFY = 0.06;                 /* extra magnification at full influence */
-  var fw = 0, fh = 0, fInf = null, fVx = null, fVy = null, flowEnergy = 0;
+  var FLOW_VELBONUS = 1.1;            /* moving fast paints more             */
+  /* Drag and swirl are PX AT FULL INFLUENCE, never geometric transforms.
+     Swirl was an angle applied about the stir point, so displacement grew
+     with distance from it: a pixel 200px away, at only 0.4 rad, moved 87px.
+     Move fast, influence rises, the far field explodes — the breakage at
+     speed. As bounded offsets along unit directions, the worst case is the
+     sum of these three, whatever the pointer does. */
+  var DISTORT = 11;                   /* px dragged along the remembered flow */
+  var SWIRL_PX = 0;                   /* px of tangential shear (the vortex)  */
+  /* The lens is a SCALE with a profile, not a pull in px. A displacement
+     proportional to influence peaks where influence peaks and collapses just
+     outside it — that jump is what tears a line as it crosses. Here the core
+     magnifies almost uniformly (a uniform scale does not deform a line at
+     all, it only enlarges it) and eases to nothing at the rim, so the mapping
+     stays monotone: the line stretches and springs back, it can never break.
+     Radius is its own constant, independent of the brush. */
+  var LENS_R = 135;                   /* px: how wide the dome is             */
+  var LENS_MAG = 0.30;                /* peak magnification, 0.30 = +30%      */
+  var fw = 0, fh = 0, fInf = null, fVx = null, fVy = null, fTmp = null, flowEnergy = 0;
+  var DIFFUSE = 3;                    /* relaxation passes per frame          */
 
   /* Two-stage damping, DeepSeek's trick: velocity is read from the GAP
      between the raw pointer and its own smoothed follower, so inertia comes
@@ -423,6 +438,7 @@ var ART = (document.getElementById('bg') || {}).dataset
     fInf = new Float32Array(fw * fh);
     fVx = new Float32Array(fw * fh);
     fVy = new Float32Array(fw * fh);
+    fTmp = new Float32Array(fw * fh);
     flowEnergy = 0;
     mSm.x = -1;
   }
@@ -474,10 +490,36 @@ var ART = (document.getElementById('bg') || {}).dataset
           }
         }
         fInf[k] = v;
-        if (v > peak) peak = v;
       }
     }
+
+    for (var d = 0; d < DIFFUSE; d++) { relax(fInf); relax(fVx); relax(fVy); }
+
+    for (var m2 = 0; m2 < fInf.length; m2++) if (fInf[m2] > peak) peak = fInf[m2];
     flowEnergy = peak;
+  }
+
+  /* Relaxation. A disturbance in water does not stay where it was put: it
+     spreads and flattens. One separable 1-2-1 pass per call, run DIFFUSE
+     times per frame. This is what makes the effect read as a wave rather
+     than a stamp — wider and gentler WITHOUT touching the pointer tracking,
+     so nothing lags behind the hand. */
+  function relax(a) {
+    var i, j, k;
+    for (j = 0; j < fh; j++) {
+      var row = j * fw;
+      for (i = 0; i < fw; i++) {
+        k = row + i;
+        fTmp[k] = (a[i > 0 ? k - 1 : k] + 2 * a[k] + a[i < fw - 1 ? k + 1 : k]) * 0.25;
+      }
+    }
+    for (j = 0; j < fh; j++) {
+      var row2 = j * fw;
+      for (i = 0; i < fw; i++) {
+        k = row2 + i;
+        a[k] = (fTmp[j > 0 ? k - fw : k] + 2 * fTmp[k] + fTmp[j < fh - 1 ? k + fw : k]) * 0.25;
+      }
+    }
   }
 
   /* Bilinear read. Returns influence in .i and the remembered direction. */
@@ -549,7 +591,7 @@ var ART = (document.getElementById('bg') || {}).dataset
          fell back to their undisplaced selves — a static band all round the
          edge exactly as wide as the displacement. The source therefore
          extends PAD px beyond the pane on every side; the output does not. */
-      var PAD = Math.ceil(DISTORT * 1.6) + 8;
+      var PAD = Math.ceil(DISTORT * 1.6 + SWIRL_PX + LENS_R * LENS_MAG * 0.5) + 8;
       var sax = Math.max(ax - PAD, 0), say = Math.max(ay - PAD, 0);
       var sw = Math.round(Math.min(ax + bw + PAD, W) - sax);
       var sh = Math.round(Math.min(ay + bh + PAD, H) - say);
@@ -585,19 +627,30 @@ var ART = (document.getElementById('bg') || {}).dataset
              the effect instead of leaving a small patch bending as hard as a
              big one. 62px was the reference the constants were tuned at. */
           var inf = f.i * amp * (FLOW_RADIUS / 62);
+          if (inf > 1) inf = 1;              /* the field cannot overdrive   */
           var ox = 0, oy = 0;
           if (inf > 0.003) {
-            var ang = inf * SWIRL;
-            var ca = Math.cos(ang), sa = Math.sin(ang);
+            /* 1. drag along the direction the hand was travelling */
+            ox = -f.x * inf * DISTORT;
+            oy = -f.y * inf * DISTORT;
             var rx = wx - mSm.x, ry = wy - mSm.y;
-            var qx = mSm.x + (rx * ca - ry * sa);
-            var qy = mSm.y + (rx * sa + ry * ca);
-            qx -= f.x * inf * DISTORT;
-            qy -= f.y * inf * DISTORT;
-            var m = 1 + MAGNIFY * inf;
-            qx = mSm.x + (qx - mSm.x) / m;
-            qy = mSm.y + (qy - mSm.y) / m;
-            ox = qx - wx; oy = qy - wy;
+            var rl = Math.sqrt(rx * rx + ry * ry);
+            /* 2. tangential shear — the vortex, as a bounded offset */
+            if (SWIRL_PX && rl > 0.5) {
+              ox += (-ry / rl) * inf * SWIRL_PX;
+              oy += (rx / rl) * inf * SWIRL_PX;
+            }
+            /* 3. the lens. prof is flat at the centre and flat again at the
+                  rim — no kink at either end, so nothing is ever pierced. It
+                  also vanishes as rl -> 0, which removes the singularity the
+                  old radial pull had at the exact centre. */
+            if (rl < LENS_R) {
+              var t = 1 - (rl * rl) / (LENS_R * LENS_R);
+              var prof = t * t;
+              var m = 1 + LENS_MAG * inf * prof;
+              var pull = rl / m - rl;
+              if (rl > 0.001) { ox += pull * rx / rl; oy += pull * ry / rl; }
+            }
           }
           dX[lj * lw + li] = ox; dY[lj * lw + li] = oy;
         }
