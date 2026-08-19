@@ -135,7 +135,10 @@
 // and the tint deepens one translucent step — the same faint thickening of
 // the glass the pills have. No shadow bloom.
 .cover:hover {
-	transform: translateY(-1px) scale(1.02);
+	// No scale(). The canvas behind does not scale with the card, so while the
+	// pane grew the sketch slid against its own border — a fixed sliver at the
+	// edges, exactly as reported. The lift and the tint carry the hover.
+	transform: translateY(-1px);
 	background-color: var(--glass-tint-strong);
 }
 

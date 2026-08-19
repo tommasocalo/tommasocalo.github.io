@@ -298,12 +298,10 @@ var ART = (document.getElementById('bg') || {}).dataset
     }
   }
 
-  function targetFor(f) {
-    if (!ptr.on) return 0;
-    var cx = Math.max(f.x, Math.min(ptr.x, f.x + f.w));
-    var cy = Math.max(f.sy, Math.min(ptr.y, f.sy + f.h));
-    return smoothstep(RADIUS, RADIUS * 0.18, Math.hypot(ptr.x - cx, ptr.y - cy));
-  }
+  /* The wireframes no longer answer the pointer. Each one resolves on its
+     own, on its own schedule — see armAuto(). Hover-driven resolution made
+     the wall feel like a cursor toy; cycling on its own makes it a place
+     where interfaces are being drawn while you happen to be looking. */
 
   /* Column attenuation, painted into the pixels. Mirrors the retired CSS
      mask (full ink beyond 560px from centre, 30% across the reading column)
@@ -325,8 +323,35 @@ var ART = (document.getElementById('bg') || {}).dataset
       if (f.sy > H + 40 || f.sy + f.h < -40) continue;
       drawFrame(f);
     }
+    /* Snapshot BEFORE the column is quieted. Behind a glass pane the sketch
+       is at full strength — the pane's own tint is what protects the text
+       there, so attenuating underneath as well left the lens with almost
+       nothing to bend (measured: alpha 0.61/255 under a card). */
+    if (flowEnergy > 0.012) {
+      if (snapC.width !== canvas.width || snapC.height !== canvas.height) {
+        snapC.width = canvas.width; snapC.height = canvas.height;
+      }
+      snapX.clearRect(0, 0, snapC.width, snapC.height);
+      snapX.drawImage(canvas, 0, 0);
+      snapFresh = true;
+    } else snapFresh = false;
+
     if (!colGrad) buildColGrad();
     ctx.save();
+    /* The column is quieted EXCEPT under the glass panes, punched out as
+       even-odd holes. Under a pane the sketch stays at full strength — which
+       is also exactly what the warp samples, so a warped patch and the flat
+       scene around it can never disagree in brightness. That mismatch, plus
+       the warp covering only part of a pane, was the "static UI underneath". */
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    for (var gi = 0; gi < glassEls.length; gi++) {
+      var gr = glassEls[gi].getBoundingClientRect();
+      if (!gr.width || gr.bottom < 0 || gr.top > H) continue;
+      var grad2 = glassEls[gi].classList.contains('cover') ? 16 : Math.min(gr.width, gr.height) / 2;
+      ctx.roundRect(gr.left, gr.top, gr.width, gr.height, grad2);
+    }
+    ctx.clip('evenodd');
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = colGrad;
     ctx.fillRect(0, 0, W, H);
@@ -351,6 +376,7 @@ var ART = (document.getElementById('bg') || {}).dataset
   /* Flat-scene snapshot for the fluid pass: reading and writing the same
      canvas region in one drawImage is undefined, the copy makes it exact. */
   var snapC = document.createElement('canvas'), snapX = snapC.getContext('2d');
+  var snapFresh = false;
 
   function paintScene() {
     for (var j = 0; j < frames.length; j++) {
@@ -360,182 +386,298 @@ var ART = (document.getElementById('bg') || {}).dataset
     }
   }
 
+  /* ======================================================================
+   * FLOWMAP — the mechanism behind DeepSeek's liquid lens, ported to 2D.
+   *
+   * The distortion is NOT computed from where the pointer is. It is painted
+   * into a coarse screen-space field that PERSISTS and decays, so the medium
+   * remembers where the hand has been. That memory is the whole difference
+   * between "a shape following the cursor" and a wake in liquid.
+   *
+   *   R  = influence   how disturbed this patch of the field is
+   *   VX,VY = the direction the hand was travelling when it passed
+   *
+   * Every frame the field is scaled by DECAY (0.925 at 30fps ≈ a half-life of
+   * a third of a second) and the brush stamps a gaussian at the smoothed
+   * pointer. Written with max(), not +=, so repeated passes never blow out —
+   * a high-water mark that then evaporates.
+   * ====================================================================== */
+  var FLOW_CELL = 24;                 /* px per field cell                   */
+  var FLOW_DECAY = 0.905;             /* ~0.23s half-life: a short wake */
+  var FLOW_RADIUS = 44;               /* brush radius, px — tight             */
+  var FLOW_PRESENCE = 0.42;           /* just being there                    */
+  var FLOW_VELBONUS = 1.5;            /* moving fast paints more             */
+  var DISTORT = 17;                   /* px of drag at full influence        */
+  var SWIRL = 0.42;                   /* radians of twist at full influence  */
+  var MAGNIFY = 0.06;                 /* extra magnification at full influence */
+  var fw = 0, fh = 0, fInf = null, fVx = null, fVy = null, flowEnergy = 0;
+
+  /* Two-stage damping, DeepSeek's trick: velocity is read from the GAP
+     between the raw pointer and its own smoothed follower, so inertia comes
+     for free and no frame-delta timing is needed. */
+  var mSm = { x: -1, y: -1, vx: 0, vy: 0 };
+
+  function flowResize() {
+    fw = Math.ceil(W / FLOW_CELL) + 1;
+    fh = Math.ceil(H / FLOW_CELL) + 1;
+    fInf = new Float32Array(fw * fh);
+    fVx = new Float32Array(fw * fh);
+    fVy = new Float32Array(fw * fh);
+    flowEnergy = 0;
+    mSm.x = -1;
+  }
+
+  function flowStep() {
+    if (!fInf) return;
+    if (mSm.x < 0 && ptr.on) { mSm.x = ptr.x; mSm.y = ptr.y; }
+    if (ptr.on) {
+      /* Tighter than DeepSeek's 0.10: their field fills the whole viewport,
+         so a trailing brush reads as inertia. Ours is a small disturbance
+         inside a card, where the same lag just reads as the effect being
+         late. The brush now sits almost under the cursor.
+         Velocity is still read from the gap between raw and smoothed
+         pointer — but that gap is ~3x smaller now, so the factor is scaled
+         up to keep the same sense of speed. */
+      mSm.x += (ptr.x - mSm.x) * 0.60;
+      mSm.y += (ptr.y - mSm.y) * 0.60;
+      mSm.vx += ((ptr.x - mSm.x) * 3.2 - mSm.vx) * 0.40;
+      mSm.vy += ((ptr.y - mSm.y) * 3.2 - mSm.vy) * 0.40;
+    } else {
+      mSm.vx *= 0.9; mSm.vy *= 0.9;
+    }
+
+    var speed = Math.hypot(mSm.vx, mSm.vy);
+    var strength = FLOW_PRESENCE + Math.min(speed * 0.09, 0.7) * FLOW_VELBONUS;
+    var nvx = speed > 0.001 ? mSm.vx / speed : 0;
+    var nvy = speed > 0.001 ? mSm.vy / speed : 0;
+    var r2 = FLOW_RADIUS * FLOW_RADIUS * 0.5;
+    var reach = Math.ceil(FLOW_RADIUS * 1.6 / FLOW_CELL);
+    var ci = Math.round(mSm.x / FLOW_CELL), cj = Math.round(mSm.y / FLOW_CELL);
+    var peak = 0;
+
+    for (var j = 0; j < fh; j++) {
+      var rowNear = ptr.on && Math.abs(j - cj) <= reach;
+      for (var i = 0; i < fw; i++) {
+        var k = j * fw + i;
+        var v = fInf[k] * FLOW_DECAY;
+        fVx[k] *= FLOW_DECAY;
+        fVy[k] *= FLOW_DECAY;
+        if (rowNear && Math.abs(i - ci) <= reach) {
+          var dx = i * FLOW_CELL - mSm.x, dy = j * FLOW_CELL - mSm.y;
+          var infl = Math.exp(-(dx * dx + dy * dy) / r2) - 0.01;
+          if (infl > 0) {
+            var add = infl * strength;
+            if (add > v) v = add;
+            var blend = infl * Math.min(strength, 0.5) * 0.35;
+            fVx[k] += (nvx - fVx[k]) * blend;
+            fVy[k] += (nvy - fVy[k]) * blend;
+          }
+        }
+        fInf[k] = v;
+        if (v > peak) peak = v;
+      }
+    }
+    flowEnergy = peak;
+  }
+
+  /* Bilinear read. Returns influence in .i and the remembered direction. */
+  var _fs = { i: 0, x: 0, y: 0 };
+  function flowAt(px, py) {
+    var gx = px / FLOW_CELL, gy = py / FLOW_CELL;
+    var i0 = gx | 0, j0 = gy | 0;
+    if (i0 < 0 || j0 < 0 || i0 >= fw - 1 || j0 >= fh - 1) { _fs.i = 0; _fs.x = 0; _fs.y = 0; return _fs; }
+    var tx = gx - i0, ty = gy - j0;
+    var a = j0 * fw + i0, b = a + 1, c = a + fw, d = c + 1;
+    var w0 = (1 - tx) * (1 - ty), w1 = tx * (1 - ty), w2 = (1 - tx) * ty, w3 = tx * ty;
+    _fs.i = fInf[a] * w0 + fInf[b] * w1 + fInf[c] * w2 + fInf[d] * w3;
+    _fs.x = fVx[a] * w0 + fVx[b] * w1 + fVx[c] * w2 + fVx[d] * w3;
+    _fs.y = fVy[a] * w0 + fVy[b] * w1 + fVy[c] * w2 + fVy[d] * w3;
+    return _fs;
+  }
+
+  /* Scratch buffers for the warp. Sized to the disturbed box, reused. */
+  var wsC = document.createElement('canvas'), wsX = wsC.getContext('2d', { willReadFrequently: true });
+  var wdC = document.createElement('canvas'), wdX = wdC.getContext('2d');
+
   function drawGlassLenses() {
-    var busy = false;
-    var snapReady = false;
+    if (!snapFresh || flowEnergy < 0.012) return false;
+
+    /* The disturbed region. Outside it displacement is zero, so the flat
+       scene already IS the right answer — the optimisation and the reason
+       there is never a seam at the boundary of the worked area. */
+    var THRESH = 0.012;
+    var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    for (var j = 0; j < fh; j++) {
+      for (var i = 0; i < fw; i++) {
+        if (fInf[j * fw + i] > THRESH) {
+          var px0 = i * FLOW_CELL, py0 = j * FLOW_CELL;
+          if (px0 < minX) minX = px0; if (px0 > maxX) maxX = px0;
+          if (py0 < minY) minY = py0; if (py0 > maxY) maxY = py0;
+        }
+      }
+    }
+    if (maxX < minX) return false;
+    minX -= FLOW_CELL; minY -= FLOW_CELL; maxX += FLOW_CELL * 2; maxY += FLOW_CELL * 2;
+
+    var LAT = 8;                       /* displacement lattice spacing, px   */
+
     for (var g = 0; g < glassEls.length; g++) {
       var el = glassEls[g];
       var rc = el.getBoundingClientRect();
-      if (rc.bottom < 0 || rc.top > H || rc.right < 0 || rc.left > W || !rc.width) {
-        el.__lensM = undefined;
-        continue;
-      }
+      if (!rc.width || rc.bottom < 0 || rc.top > H || rc.right < 0 || rc.left > W) continue;
+
+      /* Does the field reach this pane at all? */
+      if (rc.right < minX || rc.left > maxX || rc.bottom < minY || rc.top > maxY) continue;
+
+      /* Warp the WHOLE pane, not just the disturbed part: a partial warp left
+         the rest of the pane showing the untouched scene, which read as a
+         second, static layer sitting under the moving one. Where the field is
+         quiet the displacement is zero, so those pixels come through
+         unchanged — one coherent image, always. */
+      var ax = Math.max(rc.left, 0), ay = Math.max(rc.top, 0);
+      var bx = Math.min(rc.right, W), by = Math.min(rc.bottom, H);
+      var bw = Math.round(bx - ax), bh = Math.round(by - ay);
+      if (bw < 4 || bh < 4) continue;
+      ax = Math.round(ax); ay = Math.round(ay);
+
       var isCard = el.classList.contains('cover');
-      /* Strength eases 0→1 on entry and back on exit. */
-      var target = el.matches(':hover') ? 1 : 0;
-      if (el.__s === undefined) el.__s = 0;
-      el.__s += (target - el.__s) * 0.14;
-      if (Math.abs(target - el.__s) > 0.004) busy = true;
-      else el.__s = target;
-      if (el.__s === 0) { el.__lx = undefined; continue; }   /* flat: no cost */
-      if (target === 1) busy = true;                          /* it breathes */
+      var amp = isCard ? 1 : 0.5;      /* small chrome bends less            */
 
-      /* THE COMPOSITE LENS. The circle stays — it is the body of the optic —
-         and the depth comes from additive layers inside it:
-           1. the bulk: the scene re-rendered through magnification, with a
-              slow liquid twist that breathes;
-           2. the flank: an annulus at the rim drawn COMPRESSED and
-              counter-twisted, the way the side of a real lens squeezes what
-              passes through it — it also swallows the doubling where the
-              magnified interior used to butt against the flat exterior;
-           3. the fringe: two hairline arcs, accent inside and ink outside,
-              faint chromatic disagreement at the boundary.
-         All vector re-rendering — nothing is sampled, so nothing doubles
-         inside — and all clipped to card ∩ circle. */
-      if (el.__lx === undefined) { el.__lx = ptr.x; el.__ly = ptr.y; }
-      el.__lx += (ptr.x - el.__lx) * 0.30;
-      el.__ly += (ptr.y - el.__ly) * 0.30;
-      if (el.__seed === undefined) el.__seed = (g * 0.77) % 6.2832;
-      var lt = performance.now() * 0.0011 + el.__seed;
+      /* --- source, resampled to CSS resolution, WITH A MARGIN ------------
+         Near the rim the displacement pulls content from outside the pane. A
+         source that stopped at the pane had no data there, so those pixels
+         fell back to their undisplaced selves — a static band all round the
+         edge exactly as wide as the displacement. The source therefore
+         extends PAD px beyond the pane on every side; the output does not. */
+      var PAD = Math.ceil(DISTORT * 1.6) + 8;
+      var sax = Math.max(ax - PAD, 0), say = Math.max(ay - PAD, 0);
+      var sw = Math.round(Math.min(ax + bw + PAD, W) - sax);
+      var sh = Math.round(Math.min(ay + bh + PAD, H) - say);
+      var offX = ax - sax, offY = ay - say;      /* pane origin inside source */
 
-      /* THE FLUID IN THE GLASS. The card is a vessel, full. The pointer does
-         not carry a lens around: it STIRS. Ripples radiate from wherever the
-         hand moves, cross the entire pane, and fade with viscosity; the whole
-         body of fluid leans gently toward the stir point. Stirring harder
-         (faster pointer) puts more energy in; stillness lets it settle to a
-         faint idle shimmer. The whole interior is replaced every frame —
-         sampled from the flat scene cell by cell through the fluid's local
-         displacement — so nothing static ever shows beneath the optic, and
-         the only boundary is the card's own edge, which is exactly where a
-         pane of glass ends. */
-      var s2 = el.__s;
-      var rad = isCard ? 16 : Math.min(rc.width, rc.height) / 2;
+      if (wsC.width !== sw || wsC.height !== sh) { wsC.width = sw; wsC.height = sh; }
+      if (wdC.width !== bw || wdC.height !== bh) { wdC.width = bw; wdC.height = bh; }
+      wsX.clearRect(0, 0, sw, sh);
+      wsX.drawImage(snapC, sax * DPR, say * DPR, sw * DPR, sh * DPR, 0, 0, sw, sh);
+      var src = wsX.getImageData(0, 0, sw, sh);
+      var sd = src.data;
+      var out = wdX.createImageData(bw, bh);
+      var od = out.data;
 
-      /* stirring energy: fed by pointer speed, drained by viscosity */
-      if (el.__pxp === undefined) { el.__pxp = ptr.x; el.__pyp = ptr.y; el.__E = 0; }
-      var vx = ptr.x - el.__pxp, vy = ptr.y - el.__pyp;
-      el.__pxp = ptr.x; el.__pyp = ptr.y;
-      el.__E = Math.min(6, (el.__E || 0) * 0.94 + Math.hypot(vx, vy) * 0.07);
-      /* the flow: a slow-memory vector of where you are stirring toward —
-         the fluid is dragged along it and relaxes viscously */
-      if (el.__fx === undefined) { el.__fx = 0; el.__fy = 0; }
-      el.__fx += (vx - el.__fx) * 0.05;
-      el.__fy += (vy - el.__fy) * 0.05;
-      if (el.__E > 0.03 || Math.abs(el.__fx) > 0.05 || Math.abs(el.__fy) > 0.05) busy = true;
-
-      if (!snapReady) {
-        snapC.width = canvas.width; snapC.height = canvas.height;
-        snapX.drawImage(canvas, 0, 0);
-        snapReady = true;
-      }
-
-      /* THE PANE HAS AN UNEVEN THICKNESS. A scalar field Φ — five broad
-         lobes on incommensurable directions and wavelengths (240-400px, far
-         too low-frequency to read as waves), drifting slowly, their phases
-         advected by the stirring flow — plus one wide bump that trails the
-         pointer. The distortion is ∇Φ: refraction through irregular glass,
-         which is the physics, and it has no circles and no ripples in it.
-         Magnification is strongest on the bump (semi-global: the whole pane
-         is optically alive, the hand only biases where the glass is thick). */
-      if (!el.__cmp) {
-        el.__cmp = [];
-        for (var ci = 0; ci < 5; ci++) {
-          var th = h1(el.__seed + ci * 7.3) * 6.2832;
-          var wl = 240 + h1(el.__seed + ci * 3.1) * 160;   /* 240..400px */
-          el.__cmp.push({
-            kx: Math.cos(th) * 6.2832 / wl,
-            ky: Math.sin(th) * 6.2832 / wl,
-            A: 0.16 + h1(el.__seed + ci * 11.7) * 0.08,
-            p0: h1(el.__seed + ci * 5.9) * 6.2832,
-            w: 0.25 + h1(el.__seed + ci * 2.3) * 0.35
-          });
+      /* --- displacement on a coarse lattice ------------------------------
+         Computed every LAT px and bilinearly interpolated per pixel, so the
+         warp is CONTINUOUS by construction. The previous version resampled
+         cell by cell, each with its own rigid offset, which tore the image
+         at every cell edge — the discontinuities. */
+      var lw = Math.ceil(bw / LAT) + 1, lh = Math.ceil(bh / LAT) + 1;
+      var dX = new Float32Array(lw * lh), dY = new Float32Array(lw * lh);
+      for (var lj = 0; lj < lh; lj++) {
+        for (var li = 0; li < lw; li++) {
+          var wx = ax + li * LAT, wy = ay + lj * LAT;
+          var f = flowAt(wx, wy);
+          /* NO wall pinning. Fading the displacement to zero at the rim was
+             tried and is worse: the middle moves while the edges sit still,
+             which is precisely what reads as a static layer underneath. A
+             real lens cuts the image at its own rim — inside is displaced,
+             outside is not, and they do not line up. The pane is warped
+             edge to edge. */
+          /* Amplitudes scale WITH the radius, so shrinking the brush thins
+             the effect instead of leaving a small patch bending as hard as a
+             big one. 62px was the reference the constants were tuned at. */
+          var inf = f.i * amp * (FLOW_RADIUS / 62);
+          var ox = 0, oy = 0;
+          if (inf > 0.003) {
+            var ang = inf * SWIRL;
+            var ca = Math.cos(ang), sa = Math.sin(ang);
+            var rx = wx - mSm.x, ry = wy - mSm.y;
+            var qx = mSm.x + (rx * ca - ry * sa);
+            var qy = mSm.y + (rx * sa + ry * ca);
+            qx -= f.x * inf * DISTORT;
+            qy -= f.y * inf * DISTORT;
+            var m = 1 + MAGNIFY * inf;
+            qx = mSm.x + (qx - mSm.x) / m;
+            qy = mSm.y + (qy - mSm.y) / m;
+            ox = qx - wx; oy = qy - wy;
+          }
+          dX[lj * lw + li] = ox; dY[lj * lw + li] = oy;
         }
       }
-      var GAIN = 520 * s2 * (1 + 0.35 * el.__E); /* field-to-pixels          */
-      var SIG = (isCard ? 130 : 55);             /* bump breadth             */
-      var SIG2 = 2 * SIG * SIG;
-      var MBODY = (isCard ? 0.05 : 0.035) * s2;  /* everywhere               */
-      var MBUMP = (isCard ? 0.11 : 0.07) * s2;   /* extra on the bump        */
-      var EDGE = isCard ? 30 : 12;               /* wall-pinning margin, px  */
-      var STRIP = 8, BANDS = isCard ? 8 : 2;
 
+      /* --- per-pixel gather, bilinear in both the field and the source --- */
+      for (var y = 0; y < bh; y++) {
+        var fy = y / LAT, j0 = fy | 0, ty = fy - j0;
+        if (j0 > lh - 2) { j0 = lh - 2; ty = 1; }
+        var r0 = j0 * lw, r1 = r0 + lw;
+        for (var x = 0; x < bw; x++) {
+          var fx = x / LAT, i0 = fx | 0, tx = fx - i0;
+          if (i0 > lw - 2) { i0 = lw - 2; tx = 1; }
+          var w0 = (1 - tx) * (1 - ty), w1 = tx * (1 - ty), w2 = (1 - tx) * ty, w3 = tx * ty;
+          var ox2 = dX[r0 + i0] * w0 + dX[r0 + i0 + 1] * w1 + dX[r1 + i0] * w2 + dX[r1 + i0 + 1] * w3;
+          var oy2 = dY[r0 + i0] * w0 + dY[r0 + i0 + 1] * w1 + dY[r1 + i0] * w2 + dY[r1 + i0 + 1] * w3;
+
+          var sx = offX + x + ox2, sy = offY + y + oy2;
+          var o = (y * bw + x) * 4;
+          /* Undisplaced pixels are the vast majority of a pane: 4 reads
+             instead of 16, and bit-exact rather than merely equal. */
+          if (ox2 > -0.02 && ox2 < 0.02 && oy2 > -0.02 && oy2 < 0.02) {
+            var q = ((offY + y) * sw + (offX + x)) * 4;
+            od[o] = sd[q]; od[o + 1] = sd[q + 1]; od[o + 2] = sd[q + 2]; od[o + 3] = sd[q + 3];
+            continue;
+          }
+          if (sx < 0) sx = 0; else if (sx > sw - 1.001) sx = sw - 1.001;
+          if (sy < 0) sy = 0; else if (sy > sh - 1.001) sy = sh - 1.001;
+          var sxi = sx | 0, syi = sy | 0, ux = sx - sxi, uy = sy - syi;
+          var p00 = (syi * sw + sxi) * 4, p10 = p00 + 4, p01 = p00 + sw * 4, p11 = p01 + 4;
+          var b0 = (1 - ux) * (1 - uy), b1 = ux * (1 - uy), b2 = (1 - ux) * uy, b3 = ux * uy;
+          od[o]     = sd[p00]     * b0 + sd[p10]     * b1 + sd[p01]     * b2 + sd[p11]     * b3;
+          od[o + 1] = sd[p00 + 1] * b0 + sd[p10 + 1] * b1 + sd[p01 + 1] * b2 + sd[p11 + 1] * b3;
+          od[o + 2] = sd[p00 + 2] * b0 + sd[p10 + 2] * b1 + sd[p01 + 2] * b2 + sd[p11 + 2] * b3;
+          od[o + 3] = sd[p00 + 3] * b0 + sd[p10 + 3] * b1 + sd[p01 + 3] * b2 + sd[p11 + 3] * b3;
+        }
+      }
+
+      wdX.putImageData(out, 0, 0);
+
+      var rad = isCard ? 16 : Math.min(rc.width, rc.height) / 2;
       ctx.save();
       ctx.beginPath();
       ctx.roundRect(rc.left, rc.top, rc.width, rc.height, rad);
       ctx.clip();
-      /* THE line. The canvas is ink on TRANSPARENCY, and drawImage composites
-         source-over: wherever the displaced sample is transparent, the flat
-         scene underneath survived — the static layer under the distortion,
-         reported three times and misdiagnosed twice. The pane must be emptied
-         before the fluid repaints it. */
-      ctx.clearRect(rc.left, rc.top, rc.width, rc.height);
-      var bandH = rc.height / BANDS;
-      for (var b2 = 0; b2 < BANDS; b2++) {
-        var by2 = rc.top + b2 * bandH;
-        var cyb = by2 + bandH / 2;
-        for (var sx0 = rc.left; sx0 < rc.right; sx0 += STRIP) {
-          var w2 = Math.min(STRIP, rc.right - sx0);
-          var cxb = sx0 + w2 / 2;
-          var ddx = cxb - el.__lx, ddy = cyb - el.__ly;
-          var dist = Math.hypot(ddx, ddy) || 1;
-          /* radial ripple from the stir point, everywhere in the pane */
-          /* THE PIN AT THE WALLS — the fix for the "two sheets" feel: every
-             optical quantity fades to zero at the card border, so each line
-             inside stays CONNECTED to its continuation outside. Nothing
-             tears at the edge; the warp lives entirely within the pane, the
-             way waves die at the rim of a dish. */
-          var de = Math.min(cxb - rc.left, rc.right - cxb, cyb - rc.top, rc.bottom - cyb);
-          var env = Math.min(1, Math.max(0, de / EDGE));
-          env = env * env * (3 - 2 * env);
-
-          /* Φ and ∇Φ, analytically, plus the trailing bump */
-          var Phi = 0, gx2 = 0, gy2 = 0;
-          for (var ci2 = 0; ci2 < 5; ci2++) {
-            var c2 = el.__cmp[ci2];
-            var arg = c2.kx * cxb + c2.ky * cyb + c2.p0 + lt * c2.w
-                    + (el.__fx * c2.kx + el.__fy * c2.ky) * 9;
-            var sv = Math.sin(arg), cv = Math.cos(arg);
-            Phi += c2.A * sv;
-            gx2 += c2.A * cv * c2.kx;
-            gy2 += c2.A * cv * c2.ky;
-          }
-          var bump = Math.exp(-(dist * dist) / SIG2);
-          gx2 += -(ddx / (SIG2 * 0.5)) * bump * 0.35;
-          gy2 += -(ddy / (SIG2 * 0.5)) * bump * 0.35;
-
-          var dxs = (GAIN * gx2 + el.__fx * 0.5) * env;
-          var dys = (GAIN * gy2 + el.__fy * 0.5) * env;
-          /* thick where Φ is high and on the bump: that is where it magnifies */
-          var mL = 1 + (MBODY * (0.5 + 0.5 * (Phi + 1) * 0.5) + MBUMP * bump) * env;
-          var sxr = el.__lx + (sx0 - el.__lx) / mL - dxs;
-          var syr = el.__ly + (by2 - el.__ly) / mL - dys;
-          ctx.drawImage(snapC,
-            sxr * DPR, syr * DPR, (w2 / mL) * DPR, (bandH / mL) * DPR,
-            sx0, by2, w2, bandH);
-        }
-      }
+      /* Clear first: the canvas is ink on transparency, so compositing the
+         warped result source-over would leave the flat scene underneath. */
+      ctx.clearRect(ax, ay, bw, bh);
+      ctx.drawImage(wdC, ax, ay);
       ctx.restore();
     }
-    return busy;
+    return true;
   }
 
+  var lastFrameAt = 0, FRAME_MS = 1000 / 30;   /* DeepSeek's cap, same reason */
   function tick(now) {
     rafId = 0;
+    if (now - lastFrameAt < FRAME_MS) { schedule(); return; }
+    lastFrameAt = now;
     blinking = (performance.now() - lastMove) < 2500;
     var dt = lastT ? Math.min(0.05, (now - lastT) / 1000) : 0.016; lastT = now;
     layoutPositions();
+    flowStep();
 
     /* Autonomous events: a bell of resolution, up and back down. */
     var autoT = {};
     for (var a = autos.length - 1; a >= 0; a--) {
       var ev = autos[a], pr = (now - ev.t0) / ev.dur;
       if (pr >= 1) { autos.splice(a, 1); continue; }
-      autoT[ev.i] = Math.max(autoT[ev.i] || 0, Math.sin(Math.PI * pr) * 0.55);
+      /* Trapezoid, not a sine: rise, HOLD fully resolved, fall. The hold is
+         what lets you actually read the interface that just assembled. */
+      var env = pr < 0.20 ? pr / 0.20
+              : pr < 0.62 ? 1
+              : 1 - (pr - 0.62) / 0.38;
+      autoT[ev.i] = Math.max(autoT[ev.i] || 0, env * env * (3 - 2 * env));
     }
 
-    var busy = autos.length > 0;
+    var busy = autos.length > 0 || flowEnergy > 0.012;
     for (var i = 0; i < frames.length; i++) {
-      var f = frames[i], tg = Math.max(targetFor(f), autoT[i] || 0);
+      var f = frames[i], tg = autoT[i] || 0;
       f.r += (tg - f.r) * Math.min(1, dt * 9);
       if (Math.abs(tg - f.r) > 0.0025) busy = true;
       else f.r = tg;
@@ -555,14 +697,19 @@ var ART = (document.getElementById('bg') || {}).dataset
         for (var i = 0; i < frames.length; i++) {
           if (frames[i].sy > -40 && frames[i].sy + frames[i].h < H + 40) vis.push(i);
         }
-        if (vis.length) {
-          autos.push({ i: vis[Math.floor(Math.random() * vis.length)],
-                       t0: performance.now(), dur: 2600 + Math.random() * 1800 });
+        /* Never re-trigger one that is already mid-cycle, and keep a few
+           running at once so the wall is always quietly working. */
+        var busyIdx = {};
+        for (var q = 0; q < autos.length; q++) busyIdx[autos[q].i] = 1;
+        var free = vis.filter(function (n) { return !busyIdx[n]; });
+        if (free.length && autos.length < 5) {
+          autos.push({ i: free[Math.floor(Math.random() * free.length)],
+                       t0: performance.now(), dur: 3200 + Math.random() * 2600 });
           schedule();
         }
       }
       armAuto();
-    }, 5000 + Math.random() * 6000);
+    }, 600 + Math.random() * 1500);
   }
   function schedule() { if (!rafId && !document.hidden && !hidden()) rafId = requestAnimationFrame(tick); }
 
@@ -586,7 +733,7 @@ var ART = (document.getElementById('bg') || {}).dataset
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    readTokens(); buildLayout();
+    readTokens(); buildLayout(); flowResize();
     colGrad = null;                       /* width changed: rebuild the ramp */
     if (reduced()) renderStatic(); else { render(); schedule(); }
   }
