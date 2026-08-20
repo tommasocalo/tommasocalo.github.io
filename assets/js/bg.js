@@ -425,6 +425,16 @@ var ART = (document.getElementById('bg') || {}).dataset
   var LENS_R = 135;                   /* px: how wide the dome is             */
   var LENS_MAG = 0.30;                /* peak magnification, 0.30 = +30%      */
   var fw = 0, fh = 0, fInf = null, fVx = null, fVy = null, fTmp = null, flowEnergy = 0;
+  /* The lens belongs to the pane the cursor is IN. The field itself is
+     global — it is painted wherever the pointer travels, and it has to be,
+     because that memory of the gesture is what makes the wake — but a pane
+     may only SPEND it while the pointer is actually over that pane. Without
+     this, passing near a card warped its interior from the outside: the
+     glass reacting to something that never touched it. Engagement rises in
+     ~100ms and falls in ~230ms, so leaving a card RELEASES the warp rather
+     than cutting it, and the field's own decay finishes the gesture. */
+  var engage = new WeakMap();
+  var ENGAGE_IN = 0.34, ENGAGE_OUT = 0.10;
   var DIFFUSE = 3;                    /* relaxation passes per frame          */
 
   /* Two-stage damping, DeepSeek's trick: velocity is read from the GAP
@@ -566,6 +576,18 @@ var ART = (document.getElementById('bg') || {}).dataset
     for (var g = 0; g < glassEls.length; g++) {
       var el = glassEls[g];
       var rc = el.getBoundingClientRect();
+
+      /* Is the cursor inside THIS frame? Tracked per pane, and eased, so the
+         answer is never a hard yes/no on any single frame. */
+      var inside = ptr.on && rc.width > 0 &&
+                   ptr.x >= rc.left && ptr.x <= rc.right &&
+                   ptr.y >= rc.top && ptr.y <= rc.bottom;
+      var eng = engage.get(el) || 0;
+      eng += ((inside ? 1 : 0) - eng) * (inside ? ENGAGE_IN : ENGAGE_OUT);
+      if (eng < 0.004) eng = 0;
+      engage.set(el, eng);
+      if (!eng) continue;
+
       if (!rc.width || rc.bottom < 0 || rc.top > H || rc.right < 0 || rc.left > W) continue;
 
       /* Does the field reach this pane at all? */
@@ -583,7 +605,7 @@ var ART = (document.getElementById('bg') || {}).dataset
       ax = Math.round(ax); ay = Math.round(ay);
 
       var isCard = el.classList.contains('cover');
-      var amp = isCard ? 1 : 0.5;      /* small chrome bends less            */
+      var amp = (isCard ? 1 : 0.5) * eng;   /* small chrome bends less       */
 
       /* --- source, resampled to CSS resolution, WITH A MARGIN ------------
          Near the rim the displacement pulls content from outside the pane. A
